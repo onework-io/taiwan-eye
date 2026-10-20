@@ -14,6 +14,7 @@ import {
   governorRequestRender,
 } from '../renderGovernor.js';
 import { describeError } from './errors.js';
+import { createTaiwanBuildingsOverlay } from '../maps/taiwanBuildings.js';
 import { t } from '../i18n/index.js';
 
 /** Construct the application globe using the caller's local configuration. */
@@ -127,5 +128,12 @@ export async function createApplicationScene({
   });
 
   signal.throwIfAborted();
-  return { viewer, tileset, mapStackController, operations };
+  // Taiwan edition: NLSC 3D buildings over the imagery globe.
+  const taiwanBuildings = createTaiwanBuildingsOverlay(viewer, {
+    Cesium,
+    requestRender: governorRequestRender,
+  });
+  defer(() => taiwanBuildings.destroy());
+  if (import.meta.env?.DEV) globalThis.__gevTaiwan3d = taiwanBuildings;
+  return { viewer, tileset, mapStackController, operations, taiwanBuildings };
 }

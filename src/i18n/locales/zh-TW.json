@@ -2813,5 +2813,9 @@
   "Tainan": "台南",
   "Hsinchu": "新竹",
   "Hualien": "花蓮",
-  "Flying to Taipei, Taiwan...": "飛往台灣台北…"
+  "Flying to Taipei, Taiwan...": "飛往台灣台北…",
+  "Show NLSC 3D buildings for Taiwan": "顯示國土測繪中心的台灣 3D 建物",
+  "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "國土測繪中心 3D 建物已開啟——在影像地圖上放大到台灣即可看到",
+  "NLSC 3D buildings: {counties}": "國土測繪中心 3D 建物：{counties}",
+  "TAIWAN 3D BUILDINGS": "台灣 3D 建物"
 }

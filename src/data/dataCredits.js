@@ -218,6 +218,12 @@ export const DATA_CREDITS = [
       '<a href="https://its.txdot.gov/" target="_blank" rel="noopener">Texas Department of Transportation</a> (courtesy)',
   },
   {
+    key: 'nlsc-3d-buildings',
+    html:
+      '3D buildings (Taiwan): ' +
+      '<a href="https://3dmaps.nlsc.gov.tw/" target="_blank" rel="noopener">內政部國土測繪中心 NLSC 3D Tiles</a>',
+  },
+  {
     key: 'taiwan-thb-cctv',
     html:
       'CCTV cameras &amp; frames (Taiwan highways): ' +

@@ -2947,5 +2947,9 @@
   "Kaohsiung": "Kaohsiung",
   "Tainan": "Tainan",
   "Hsinchu": "Hsinchu",
-  "Hualien": "Hualien"
+  "Hualien": "Hualien",
+  "Show NLSC 3D buildings for Taiwan": "Mostrar los edificios 3D del NLSC para Taiwán",
+  "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "Edificios 3D del NLSC activados: acerca la vista sobre Taiwán en un mapa de imágenes",
+  "NLSC 3D buildings: {counties}": "Edificios 3D del NLSC: {counties}",
+  "TAIWAN 3D BUILDINGS": "EDIFICIOS 3D DE TAIWÁN"
 }

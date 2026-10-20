@@ -1426,3 +1426,8 @@ html:not([lang='en']) .param-slider-row {
   text-align: right;
   flex-shrink: 0;
 }
+
+/* Taiwan edition: NLSC 3D buildings overlay toggle, under the map source chips. */
+.taiwan-3d-row {
+  margin-top: 6px;
+}

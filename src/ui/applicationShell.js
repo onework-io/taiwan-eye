@@ -22,6 +22,7 @@ import { LocationNavigation } from './locationNavigation.js';
 import { bindClearLayersControl } from './layers.js';
 import { bindCameraOrientationControls } from './cameraOrientationControls.js';
 import { createMapSourceControls } from './mapSource.js';
+import { bindTaiwanBuildingsToggle } from './taiwanBuildingsToggle.js';
 import { STYLES } from './effects.js';
 import { isHudLayout } from '../hudLayouts.js';
 import {
@@ -858,6 +859,8 @@ export class StyleManager extends ShellFacade {
   _initMapStackControl() {
     if (!this.mapStackController) return;
 
+    this._unbindTaiwanBuildings?.();
+    this._unbindTaiwanBuildings = bindTaiwanBuildingsToggle(document);
     this._mapSourceControls?.destroy();
     this._mapSourceControls = createMapSourceControls({
       container: this._mapStackChips,
@@ -1735,6 +1738,7 @@ export class StyleManager extends ShellFacade {
     this._feedback.destroy();
 
     this._displayBindings.destroy();
+    this._unbindTaiwanBuildings?.();
     this._mapSourceControls?.destroy();
     this._cameraOrientationControls?.destroy();
     this._clearLayersControl?.destroy();

@@ -3014,5 +3014,9 @@
   "Kaohsiung": "Гаосюн",
   "Tainan": "Тайнань",
   "Hsinchu": "Синьчжу",
-  "Hualien": "Хуалянь"
+  "Hualien": "Хуалянь",
+  "Show NLSC 3D buildings for Taiwan": "Показать 3D-здания NLSC для Тайваня",
+  "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "3D-здания NLSC включены — приблизьте Тайвань на карте со снимками",
+  "NLSC 3D buildings: {counties}": "3D-здания NLSC: {counties}",
+  "TAIWAN 3D BUILDINGS": "3D-ЗДАНИЯ ТАЙВАНЯ"
 }
