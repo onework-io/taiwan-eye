@@ -3018,5 +3018,19 @@
   "Show NLSC 3D buildings for Taiwan": "Показать 3D-здания NLSC для Тайваня",
   "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "3D-здания NLSC включены — приблизьте Тайвань на карте со снимками",
   "NLSC 3D buildings: {counties}": "3D-здания NLSC: {counties}",
-  "TAIWAN 3D BUILDINGS": "3D-ЗДАНИЯ ТАЙВАНЯ"
+  "TAIWAN 3D BUILDINGS": "3D-ЗДАНИЯ ТАЙВАНЯ",
+  "{name} · level {value} m": "{name} · уровень {value} м",
+  "{name} · flood depth {value} cm": "{name} · подтопление {value} см",
+  "{name} · level {value} m · storage {storage} ×10⁴ m³": "{name} · уровень {value} м · запас {storage} ×10⁴ м³",
+  "Taiwan water request failed": "Не удалось получить данные о воде Тайваня",
+  "{rivers} river gauges · {floods} flood sensors · {reservoirs} reservoirs": "гидропостов: {rivers} · датчиков подтопления: {floods} · водохранилищ: {reservoirs}",
+  "Alert level 3": "Тревога 3-го уровня",
+  "Alert level 2": "Тревога 2-го уровня",
+  "Alert level 1": "Тревога 1-го уровня",
+  "Flooding": "Подтопление",
+  "No flooding": "Без подтопления",
+  "Reservoir": "Водохранилище",
+  "No reading": "Нет данных",
+  "Malformed Taiwan water snapshot": "Повреждённый снимок данных о воде Тайваня",
+  "Taiwan water": "Вода Тайваня"
 }

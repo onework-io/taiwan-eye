@@ -2817,5 +2817,19 @@
   "Show NLSC 3D buildings for Taiwan": "顯示國土測繪中心的台灣 3D 建物",
   "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "國土測繪中心 3D 建物已開啟——在影像地圖上放大到台灣即可看到",
   "NLSC 3D buildings: {counties}": "國土測繪中心 3D 建物：{counties}",
-  "TAIWAN 3D BUILDINGS": "台灣 3D 建物"
+  "TAIWAN 3D BUILDINGS": "台灣 3D 建物",
+  "{name} · level {value} m": "{name} · 水位 {value} m",
+  "{name} · flood depth {value} cm": "{name} · 淹水深度 {value} cm",
+  "{name} · level {value} m · storage {storage} ×10⁴ m³": "{name} · 水位 {value} m · 有效蓄水 {storage} 萬 m³",
+  "Taiwan water request failed": "台灣水情資料讀取失敗",
+  "{rivers} river gauges · {floods} flood sensors · {reservoirs} reservoirs": "{rivers} 個河川水位站 · {floods} 個淹水感測器 · {reservoirs} 座水庫",
+  "Alert level 3": "三級警戒",
+  "Alert level 2": "二級警戒",
+  "Alert level 1": "一級警戒",
+  "Flooding": "淹水中",
+  "No flooding": "未淹水",
+  "Reservoir": "水庫",
+  "No reading": "無資料",
+  "Malformed Taiwan water snapshot": "台灣水情資料格式錯誤",
+  "Taiwan water": "台灣水情"
 }

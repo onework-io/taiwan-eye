@@ -218,6 +218,14 @@ export const DATA_CREDITS = [
       '<a href="https://its.txdot.gov/" target="_blank" rel="noopener">Texas Department of Transportation</a> (courtesy)',
   },
   {
+    key: 'taiwan-water',
+    html:
+      'Taiwan water (river levels, reservoirs): ' +
+      '<a href="https://opendata.wra.gov.tw/" target="_blank" rel="noopener">經濟部水利署 水利資料開放平台</a>; ' +
+      'flood sensors: <a href="https://ci.taiwan.gov.tw/" target="_blank" rel="noopener">民生公共物聯網 Civil IoT Taiwan</a> ' +
+      '(Open Government Data License v1.0)',
+  },
+  {
     key: 'nlsc-3d-buildings',
     html:
       '3D buildings (Taiwan): ' +

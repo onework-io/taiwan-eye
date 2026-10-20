@@ -2951,5 +2951,19 @@
   "Show NLSC 3D buildings for Taiwan": "Mostrar los edificios 3D del NLSC para Taiwán",
   "NLSC 3D buildings on — zoom in over Taiwan on an imagery map": "Edificios 3D del NLSC activados: acerca la vista sobre Taiwán en un mapa de imágenes",
   "NLSC 3D buildings: {counties}": "Edificios 3D del NLSC: {counties}",
-  "TAIWAN 3D BUILDINGS": "EDIFICIOS 3D DE TAIWÁN"
+  "TAIWAN 3D BUILDINGS": "EDIFICIOS 3D DE TAIWÁN",
+  "{name} · level {value} m": "{name} · nivel {value} m",
+  "{name} · flood depth {value} cm": "{name} · inundación {value} cm",
+  "{name} · level {value} m · storage {storage} ×10⁴ m³": "{name} · nivel {value} m · reserva {storage} ×10⁴ m³",
+  "Taiwan water request failed": "Falló la solicitud de agua de Taiwán",
+  "{rivers} river gauges · {floods} flood sensors · {reservoirs} reservoirs": "{rivers} estaciones fluviales · {floods} sensores de inundación · {reservoirs} embalses",
+  "Alert level 3": "Alerta nivel 3",
+  "Alert level 2": "Alerta nivel 2",
+  "Alert level 1": "Alerta nivel 1",
+  "Flooding": "Inundación",
+  "No flooding": "Sin inundación",
+  "Reservoir": "Embalse",
+  "No reading": "Sin lectura",
+  "Malformed Taiwan water snapshot": "Instantánea de agua de Taiwán mal formada",
+  "Taiwan water": "Agua de Taiwán"
 }

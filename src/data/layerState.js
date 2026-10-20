@@ -688,6 +688,13 @@ export const LAYER_STATE_REGISTRY = Object.freeze([
     optionOwner: 'street-level',
   }),
   Object.freeze({
+    id: 'taiwan-water',
+    // Taiwan-edition layer: a token from the far end of the pair range, so
+    // upstream's next allocations (5, 6, … 00, 01, …) never collide with it.
+    token: 'zz',
+    disposition: 'enabled-only',
+  }),
+  Object.freeze({
     id: 'telegeography-submarine-cables',
     token: 'u',
     disposition: 'enabled-only',
