@@ -14,6 +14,8 @@
 | 台灣 CCTV    | 交通部公路局（省道、快速公路）與高速公路局（國道）的公開即時影像，免金鑰。                                                                                         |
 | YouBike      | 台北市 YouBike 2.0 即時站點與車輛數，接入公共自行車圖層，免金鑰。                                                                                                  |
 | 品牌         | 標題、載入畫面與 PWA 名稱改為「台灣天眼」。                                                                                                                        |
+| 台灣 3D 建物 | 國土測繪中心 3D Tiles（台北用分棟版），疊在衛星影像上，只載入畫面附近的縣市；「地圖來源」面板可開關。                                                              |
+| 台灣水情     | 「事件」圖層組的「台灣水情」：河川水位（依警戒值上色）、淹水感測器、主要水庫水位與有效蓄水量，每 10 分鐘更新。                                                     |
 
 航班（ADS-B）、船舶（AIS）、衛星、USGS 地震、GFS/ECMWF 天氣、颱風路徑等全球圖層原本就涵蓋台灣，不需額外設定。
 
@@ -40,6 +42,9 @@ npm run dev
 | 公路局 CCTV      | `https://cctv-maintain.thb.gov.tw/opendataCCTVs.xml`（備援 `thbapp.thb.gov.tw/opendata/cctv/info/cctvs.xml`），MOTC v2.0 XML，取 `/snapshot` 靜態影像 | 政府資料開放授權條款 第1版 |
 | 國道 CCTV        | `https://tisvcloud.freeway.gov.tw/history/motc20/CCTV.xml`（備援 `thbapp.thb.gov.tw/services/cctv/freeway`），影像為 MJPEG，伺服器擷取第一張 JPEG     | 政府資料開放授權條款 第1版 |
 | YouBike 2.0 台北 | `https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json`，由 `server/providers/youbike.js` 轉成 GBFS                         | 政府資料開放授權條款 第1版 |
+| 3D 建物          | `https://3dtiles.nlsc.gov.tw/building/tiles3d/<縣市代碼>/tileset.json`（國土測繪中心，免申請）                                                        | 國土測繪中心介接規範       |
+| 河川水位、水庫   | 水利署水利資料開放平台 `https://opendata.wra.gov.tw/api/v2/…`（站況、即時水位、水庫水情、水庫每日營運），由 `server/providers/taiwanWater.js` 整合    | 政府資料開放授權條款 第1版 |
+| 淹水感測器       | 民生公共物聯網 SensorThings `https://sta.colife.org.tw/STA_WaterResource_v2/v1.0/Datastreams`（水利署淹水深度）                                       | 政府資料開放授權條款 第1版 |
 
 各來源可用環境變數關閉或調整數量：
 
@@ -71,3 +76,8 @@ git fetch upstream
 git merge upstream/main     # 在 taiwan 分支上
 npm run i18n                # 列出上游新增、尚未翻譯的字串
 ```
+
+## 注意
+
+- 水庫資料本身沒有座標，位置取自 `src/layers/taiwanWater/records.js` 裡主要水庫的約略座標；表裡沒有的水庫（多為攔河堰）不顯示。
+- 「台灣水情」的分享連結代碼用 `zz`，刻意避開上游未來會用的代碼，所以 `npm run layer-token:check` 會提示它不是「下一個代碼」，這是預期中的。
