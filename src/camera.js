@@ -47,13 +47,13 @@ export function flyToPreset(viewer, presetName, duration = 3.0) {
 }
 
 /**
- * Set camera to Austin on load with a cinematic fly-in.
+ * Startup view for the Taiwan edition: open on the whole island, then fly in
+ * to Taipei 101.
  * @returns {Function} Cancels the pending or active startup flight.
  */
-export function flyToAustin(viewer) {
-  // Start from a high altitude, then fly down
+export function flyToTaiwan(viewer) {
   viewer.camera.setView({
-    destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 25000),
+    destination: Cesium.Cartesian3.fromDegrees(120.95, 23.7, 900000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-90),
@@ -61,17 +61,17 @@ export function flyToAustin(viewer) {
     },
   });
 
-  // Cinematic fly-in after a brief pause
   const timer = setTimeout(() => {
     if (viewer.isDestroyed()) return;
     viewer.camera.flyTo({
-      destination: Cesium.Cartesian3.fromDegrees(-97.7431, 30.2672, 600),
+      // ~2.2 km south-south-east of Taipei 101, looking north-west at it.
+      destination: Cesium.Cartesian3.fromDegrees(121.5745, 25.0175, 1200),
       orientation: {
-        heading: Cesium.Math.toRadians(15),
-        pitch: Cesium.Math.toRadians(-30),
+        heading: Cesium.Math.toRadians(330),
+        pitch: Cesium.Math.toRadians(-18),
         roll: 0.0,
       },
-      duration: 4.0,
+      duration: 5.0,
       easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
     });
   }, 500);
@@ -80,3 +80,6 @@ export function flyToAustin(viewer) {
     if (!viewer.isDestroyed()) viewer.camera.cancelFlight();
   };
 }
+
+/** Upstream name, kept so upstream tests and callers still resolve. */
+export const flyToAustin = flyToTaiwan;

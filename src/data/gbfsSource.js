@@ -12,6 +12,8 @@ const GBFS_ALLOWED_HOSTS = new Set([
   'gbfs.urbansharing.com',
   'api.entur.io',
   'api.cyclocity.fr',
+  // Virtual: YouBike (Taiwan) feeds reshaped to GBFS by server/providers/youbike.js.
+  'youbike.gbfs.invalid',
 ]);
 
 /**

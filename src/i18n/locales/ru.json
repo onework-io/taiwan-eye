@@ -1,5 +1,4 @@
 {
-  "Flying to Austin, TX...": "Перелёт в Остин, Техас...",
   "Restoring shared view...": "Восстановление общего вида...",
   "Initializing systems...": "Инициализация систем...",
   "Configuring viewer...": "Настройка просмотрщика...",
@@ -3008,5 +3007,12 @@
   "Gemini access was refused. Check the API key and model access.": "Доступ к Gemini запрещён. Проверьте ключ API и доступ к модели.",
   "Gemini Live is unavailable for the configured model.": "Gemini Live недоступен для выбранной модели.",
   "Token request is too large": "Запрос токена слишком велик",
-  "Use an empty JSON token request": "Используйте запрос токена с пустым объектом JSON"
+  "Use an empty JSON token request": "Используйте запрос токена с пустым объектом JSON",
+  "Flying to Taipei, Taiwan...": "Летим в Тайбэй, Тайвань...",
+  "Taipei": "Тайбэй",
+  "Taichung": "Тайчжун",
+  "Kaohsiung": "Гаосюн",
+  "Tainan": "Тайнань",
+  "Hsinchu": "Синьчжу",
+  "Hualien": "Хуалянь"
 }

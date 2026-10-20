@@ -9,6 +9,7 @@ import {
   proxyMediaResponse,
   fetchCctvImageFromUpstream,
   fetchTxdotSnapshot,
+  fetchMjpegFirstFrame,
   fetchCctvMediaUpstream,
   watchDownstreamClose,
 } from './cctv/media.js';
@@ -507,7 +508,9 @@ export function cctvProxy({ sourceRoot = process.cwd() } = {}) {
         const upstreamImage =
           source?.sourceKind === 'txdot-its'
             ? await fetchTxdotSnapshot(upstreamCandidate)
-            : await fetchCctvImageFromUpstream(upstreamCandidate);
+            : source?.sourceKind === 'nfb-mjpeg'
+              ? await fetchMjpegFirstFrame(upstreamCandidate)
+              : await fetchCctvImageFromUpstream(upstreamCandidate);
         if (upstreamImage?.ok) {
           setHealth(cameraId, {
             status: 'ok',

@@ -66,6 +66,18 @@ function enturEntry({
 }
 const RAW_GBFS_CITY_REGISTRY = [
   {
+    // YouBike 2.0 Taipei: open data reshaped to GBFS by server/providers/youbike.js.
+    id: 'taipei-youbike',
+    city: 'Taipei, TW',
+    centerLat: 25.0375,
+    centerLon: 121.5637,
+    loadRadiusKm: 60,
+    stationInformationUrl:
+      'https://youbike.gbfs.invalid/taipei/station_information.json',
+    stationStatusUrl: 'https://youbike.gbfs.invalid/taipei/station_status.json',
+    provider: 'YouBike',
+  },
+  {
     id: 'nyc-citibike',
     city: 'New York, NY',
     centerLat: 40.7484,

@@ -18,8 +18,9 @@ import {
 } from './locale.js';
 import es from './locales/es.json' with { type: 'json' };
 import ru from './locales/ru.json' with { type: 'json' };
+import zhTW from './locales/zh-TW.json' with { type: 'json' };
 
-const CATALOGS = Object.freeze({ es, ru });
+const CATALOGS = Object.freeze({ es, ru, 'zh-TW': zhTW });
 
 let currentLocale = DEFAULT_LOCALE;
 

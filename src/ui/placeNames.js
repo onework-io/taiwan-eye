@@ -10,12 +10,18 @@
  * Pure: imports only i18n, no DOM.
  * @module ui/placeNames
  */
-import { msg, t } from '../i18n/index.js';
+import { getLocale, msg, t } from '../i18n/index.js';
 
 // The preset cities (CITY_POIS names, kept in step by placeNames.test.mjs),
 // and Los Angeles, which voice results name for the analyst's region scopes.
 const PLACE_NAME_KEYS = new Map(
   [
+    msg('Taipei'),
+    msg('Taichung'),
+    msg('Kaohsiung'),
+    msg('Tainan'),
+    msg('Hsinchu'),
+    msg('Hualien'),
     msg('Austin'),
     msg('San Francisco'),
     msg('New York'),
@@ -38,6 +44,19 @@ export function localizePlaceName(name) {
   if (typeof name !== 'string') return name;
   const key = PLACE_NAME_KEYS.get(name.trim());
   return key ? t(key) : name;
+}
+
+/**
+ * A preset landmark's label in the active language: its `nameZh` when the
+ * page runs in Traditional Chinese, else its English `name`.
+ * @param {{name: string, nameZh?: string}} poi
+ * @returns {string}
+ */
+export function localizePoiName(poi) {
+  if (!poi) return '';
+  if (getLocale() === 'zh-TW' && typeof poi.nameZh === 'string' && poi.nameZh)
+    return poi.nameZh;
+  return poi.name;
 }
 
 /** The English names this module translates (for tests). */

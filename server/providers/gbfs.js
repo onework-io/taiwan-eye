@@ -1,4 +1,5 @@
 import { readResponseTextCapped } from './common/http.js';
+import { YOUBIKE_VIRTUAL_HOST, fetchYoubikeGbfs } from './youbike.js';
 import { makeRateLimiter, clientKey } from './common/rate-limit.js';
 import {
   isAllowedGbfsHost,
@@ -235,7 +236,12 @@ export function gbfsProxy({ ratePerMinute = GBFS_RATE_PER_MIN } = {}) {
           return;
         }
 
-        const upstream = await fetchGbfsUpstream(upstreamUrl.toString());
+        // YouBike (Taiwan) is not GBFS: its virtual host is answered by the
+        // adapter, which reshapes the city's fixed open-data feed.
+        const upstream =
+          upstreamUrl.hostname === YOUBIKE_VIRTUAL_HOST
+            ? await fetchYoubikeGbfs(upstreamUrl.pathname)
+            : await fetchGbfsUpstream(upstreamUrl.toString());
         res.writeHead(upstream.status, {
           'Content-Type': upstream.contentType,
           'Cache-Control': gbfsCacheControl(upstreamUrl.pathname),

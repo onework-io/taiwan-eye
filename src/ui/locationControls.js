@@ -1,6 +1,6 @@
 import { locationMiniStatus } from '../locationStatus.js';
 import { t } from '../i18n/index.js';
-import { localizePlaceName } from './placeNames.js';
+import { localizePlaceName, localizePoiName } from './placeNames.js';
 
 const POI_KEYS = ['Q', 'W', 'E', 'R', 'T'];
 
@@ -108,7 +108,7 @@ export class LocationControls {
       key.textContent = POI_KEYS[index] || index + 1;
       const label = this.doc.createElement('span');
       label.className = 'poi-pill-name';
-      label.textContent = poi.name;
+      label.textContent = localizePoiName(poi);
       pill.append(key, label);
       this.bind(
         pill,

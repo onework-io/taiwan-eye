@@ -218,6 +218,27 @@ export const DATA_CREDITS = [
       '<a href="https://its.txdot.gov/" target="_blank" rel="noopener">Texas Department of Transportation</a> (courtesy)',
   },
   {
+    key: 'taiwan-thb-cctv',
+    html:
+      'CCTV cameras &amp; frames (Taiwan highways): ' +
+      '<a href="https://www.thb.gov.tw/" target="_blank" rel="noopener">交通部公路局 Highway Bureau, MOTC</a> ' +
+      '(<a href="https://data.gov.tw/license" target="_blank" rel="noopener">Open Government Data License v1.0</a>)',
+  },
+  {
+    key: 'taiwan-nfb-cctv',
+    html:
+      'CCTV cameras &amp; frames (Taiwan freeways): ' +
+      '<a href="https://www.freeway.gov.tw/" target="_blank" rel="noopener">交通部高速公路局 Freeway Bureau, MOTC</a> ' +
+      '(<a href="https://data.gov.tw/license" target="_blank" rel="noopener">Open Government Data License v1.0</a>)',
+  },
+  {
+    key: 'youbike',
+    html:
+      'Bike share (Taipei): YouBike 2.0 station data, ' +
+      '<a href="https://data.taipei/" target="_blank" rel="noopener">臺北市政府交通局 data.taipei</a> ' +
+      '(<a href="https://data.gov.tw/license" target="_blank" rel="noopener">Open Government Data License v1.0</a>)',
+  },
+  {
     key: 'deldot-cctv',
     html: 'CCTV live video (Delaware): <a href="https://deldot.gov/map/" target="_blank" rel="noopener">DelDOT — Delaware Department of Transportation</a>',
   },

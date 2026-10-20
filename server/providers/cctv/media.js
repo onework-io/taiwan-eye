@@ -558,3 +558,82 @@ export async function fetchCctvImageFromUpstream(
     controller.abort();
   }
 }
+
+/**
+ * First complete JPEG in a buffer (SOI 0xFFD8 … EOI 0xFFD9), or null.
+ * @param {Buffer} buf
+ * @returns {Buffer|null}
+ */
+export function firstJpegInBuffer(buf) {
+  const start = buf.indexOf(Buffer.from([0xff, 0xd8, 0xff]));
+  if (start < 0) return null;
+  const end = buf.indexOf(Buffer.from([0xff, 0xd9]), start + 3);
+  if (end < 0) return null;
+  return buf.subarray(start, end + 2);
+}
+
+/**
+ * One still from an MJPEG stream (Taiwan freeway cameras publish nothing
+ * else): read the multipart stream until its first complete JPEG, then drop
+ * the connection. Same-host redirects only, capped bytes, bounded time; a
+ * plain image/jpeg answer is accepted as is.
+ *
+ * @param {string} url - Server-registered MJPEG URL.
+ * @returns {Promise<{ok:true,body:Buffer,contentType:string}|null>}
+ */
+export async function fetchMjpegFirstFrame(
+  url,
+  {
+    fetchImpl = fetch,
+    timeoutMs = CCTV_FRAME_FETCH_TIMEOUT_MS,
+    maxBytes = CCTV_FRAME_MAX_BODY_BYTES,
+  } = {},
+) {
+  if (!url || !/^https?:\/\//i.test(url)) return null;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => {
+    controller.abort(
+      new DOMException('CCTV MJPEG frame fetch timed out', 'TimeoutError'),
+    );
+  }, timeoutMs);
+  try {
+    const upstream = await fetchWithinHost(
+      url,
+      {
+        headers: { 'User-Agent': cctvUpstreamUserAgent(url) },
+        signal: controller.signal,
+      },
+      fetchImpl,
+    );
+    if (!upstream?.ok || !upstream.body) return null;
+    const contentType = (
+      upstream.headers.get('content-type') || ''
+    ).toLowerCase();
+    if (
+      !contentType.startsWith('multipart/') &&
+      !contentType.startsWith('image/jpeg')
+    )
+      return null;
+    const chunks = [];
+    let total = 0;
+    for await (const chunk of upstream.body) {
+      total += chunk.byteLength;
+      if (total > maxBytes) return null;
+      chunks.push(Buffer.from(chunk));
+      const frame = firstJpegInBuffer(Buffer.concat(chunks, total));
+      if (frame) {
+        return {
+          ok: true,
+          body: Buffer.from(frame),
+          contentType: 'image/jpeg',
+        };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+    controller.abort();
+  }
+}

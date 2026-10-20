@@ -8,13 +8,14 @@ export const LOCALE_STORAGE_KEY = 'gev:locale:v1';
 export const DEFAULT_LOCALE = 'en';
 
 /** Shipped locales; order does not matter. Adding one: docs/TRANSLATORS.md. */
-export const LOCALES = Object.freeze(['en', 'es', 'ru']);
+export const LOCALES = Object.freeze(['en', 'es', 'ru', 'zh-TW']);
 
 /** Each locale named in its own language, for the selector. */
 export const LOCALE_NAMES = Object.freeze({
   en: 'English',
   es: 'Español',
   ru: 'Русский',
+  'zh-TW': '繁體中文',
 });
 
 /** Right-to-left locales. */
@@ -26,7 +27,11 @@ const RTL_LOCALES = Object.freeze([]);
  */
 export function normalizeLocale(candidate) {
   if (typeof candidate !== 'string') return null;
-  const primary = candidate.trim().toLowerCase().split(/[-_]/)[0];
+  const parts = candidate.trim().toLowerCase().split(/[-_]/);
+  const primary = parts[0];
+  // Chinese: every zh tag (zh, zh-TW, zh-Hant, zh-HK, zh-CN…) resolves to the
+  // one shipped Chinese catalog, Traditional Chinese for Taiwan.
+  if (primary === 'zh') return 'zh-TW';
   return LOCALES.includes(primary) ? primary : null;
 }
 

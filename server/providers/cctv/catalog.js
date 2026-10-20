@@ -5,6 +5,7 @@ import { allocateSourceCap, resolveCatalogCap } from './cap.js';
 import { loadGroundHeights, joinGroundHeights } from './groundHeights.js';
 import { cameraRegion, normalizeSourceItem } from './normalize.js';
 import { loadLithuaniaSources } from './lithuania.js';
+import { loadTaiwanThbSources, loadTaiwanNfbSources } from './taiwan.js';
 import {
   loadAustinSourcesFromOpenData,
   loadCaltransSourcesFromOpenData,
@@ -45,6 +46,17 @@ const envOptIn = (name) => String(process.env[name] || '').trim() === '1';
  * terms are unconfirmed.
  */
 const LIVE_PACKS = [
+  // Taiwan edition: keyless MOTC open data (see server/providers/cctv/taiwan.js).
+  {
+    name: 'taiwan-thb',
+    enabled: () => envEnabled('CCTV_TAIWAN_THB_ENABLED'),
+    load: loadTaiwanThbSources,
+  },
+  {
+    name: 'taiwan-nfb',
+    enabled: () => envEnabled('CCTV_TAIWAN_NFB_ENABLED'),
+    load: loadTaiwanNfbSources,
+  },
   { name: 'austin', enabled: () => true, load: loadAustinSourcesFromOpenData },
   {
     name: 'caltrans',

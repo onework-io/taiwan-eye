@@ -1,3 +1,5 @@
+> **🇹🇼 台灣版（taiwan 分支）**：繁體中文介面、開場聚焦台灣、台灣 CCTV 與 YouBike。說明見 [README.zh-TW.md](README.zh-TW.md)。
+
 <div align="center">
 
 # 🌐 God's Eye View
