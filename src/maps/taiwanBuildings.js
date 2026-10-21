@@ -205,10 +205,10 @@ export const TAIWAN_BUILDINGS_BASE_URL =
   'https://3dtiles.nlsc.gov.tw/building/tiles3d';
 export const TAIWAN_BUILDINGS_STORAGE_KEY = 'gev:taiwan-3d-buildings:v1';
 /** Above this camera height the overlay is hidden (buildings are invisible). */
-export const MAX_VIEW_HEIGHT_M = 60000;
+export const MAX_VIEW_HEIGHT_M = 20000;
 /** Load a county when the camera's ground point is this close to its edge. */
 export const LOAD_MARGIN_KM = 8;
-export const MAX_LOADED = 3;
+export const MAX_LOADED = 1;
 
 export function tilesetUrl(entry) {
   return `${TAIWAN_BUILDINGS_BASE_URL}/${entry.id}/tileset.json`;
@@ -340,9 +340,9 @@ export function createTaiwanBuildingsOverlay(
     record.lastUsed = Date.now();
     if (record.tileset || record.loading) return record.loading;
     record.loading = Cesium.Cesium3DTileset.fromUrl(tilesetUrl(entry), {
-      maximumScreenSpaceError: 16,
-      cacheBytes: 384 * 1024 * 1024,
-      maximumCacheOverflowBytes: 256 * 1024 * 1024,
+      maximumScreenSpaceError: 24,
+      cacheBytes: 160 * 1024 * 1024,
+      maximumCacheOverflowBytes: 64 * 1024 * 1024,
       // Rooftops stop the camera like the photoreal mesh does.
       enableCollision: true,
     })
