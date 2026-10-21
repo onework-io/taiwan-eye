@@ -26,6 +26,14 @@ export function voiceStatusLabel(status) {
   }
 }
 
+/**
+ * Taiwan edition: voice (OpenAI Realtime) is off unless the build sets
+ * VITE_ENABLE_VOICE=1. Outside Vite (node tests) it stays on.
+ */
+export const VOICE_UI_ENABLED = import.meta.env
+  ? import.meta.env.VITE_ENABLE_VOICE === '1'
+  : true;
+
 /** Build the voice control independently of its connection backend. */
 export function createVoiceControl({ reset = false } = {}) {
   let root = document.getElementById('gev-voice-control');
@@ -37,6 +45,7 @@ export function createVoiceControl({ reset = false } = {}) {
     root = document.createElement('div');
     root.id = 'gev-voice-control';
     root.dataset.status = 'idle';
+    root.hidden = !VOICE_UI_ENABLED;
     root.dataset.speaker = 'idle';
     root.innerHTML = `
       <label id="gev-voice-provider-field" class="gev-voice-provider-field" hidden>

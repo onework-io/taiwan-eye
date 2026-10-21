@@ -1,0 +1,107 @@
+/* ── Taiwan edition: brand icons and globe-action tiles ──────────────
+ * Line icons live in /public/ui-icons and are drawn as CSS masks, so they
+ * take the button's text colour. The cyber theme keeps its own styling.
+ */
+:root {
+  --tw-amber: #ffb547;
+  --tw-tile-edge: rgba(54, 220, 255, 0.3);
+  --tw-tile-fill: rgba(5, 16, 23, 0.84);
+  --tw-tile-cut: 8px;
+}
+
+.tw-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background: currentColor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+}
+
+.tw-icon-layers-clear {
+  mask-image: url('/ui-icons/layers-clear.svg');
+  -webkit-mask-image: url('/ui-icons/layers-clear.svg');
+}
+.tw-icon-share {
+  mask-image: url('/ui-icons/share.svg');
+  -webkit-mask-image: url('/ui-icons/share.svg');
+}
+.tw-icon-tilt {
+  mask-image: url('/ui-icons/tilt.svg');
+  -webkit-mask-image: url('/ui-icons/tilt.svg');
+}
+.tw-icon-north {
+  mask-image: url('/ui-icons/north.svg');
+  -webkit-mask-image: url('/ui-icons/north.svg');
+}
+.tw-icon-globe-reset {
+  mask-image: url('/ui-icons/globe-reset.svg');
+  -webkit-mask-image: url('/ui-icons/globe-reset.svg');
+}
+
+#north-up-view .camera-compass-needle.tw-icon {
+  width: 16px;
+  height: 16px;
+  margin-top: 6px;
+}
+
+/* Cut-corner tiles instead of round glass buttons. */
+:root:not([data-ui-theme='cyber'])
+  #top-center-actions
+  > button:not(#key-setup-chip) {
+  position: relative;
+  isolation: isolate;
+  border: 0;
+  border-radius: 0;
+  background: var(--tw-tile-edge);
+  color: #a9dbe8;
+  clip-path: polygon(
+    var(--tw-tile-cut) 0,
+    100% 0,
+    100% calc(100% - var(--tw-tile-cut)),
+    calc(100% - var(--tw-tile-cut)) 100%,
+    0 100%,
+    0 var(--tw-tile-cut)
+  );
+}
+
+:root:not([data-ui-theme='cyber'])
+  #top-center-actions
+  > button:not(#key-setup-chip)::before {
+  position: absolute;
+  z-index: -1;
+  inset: 1px;
+  background: var(--tw-tile-fill);
+  clip-path: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+:root:not([data-ui-theme='cyber'])
+  #top-center-actions
+  > button:not(#key-setup-chip):is(:hover, :focus-visible) {
+  background: var(--accent);
+  color: var(--accent);
+  box-shadow: none;
+}
+
+:root:not([data-ui-theme='cyber'])
+  #top-center-actions
+  > button:not(#key-setup-chip)[aria-pressed='true'] {
+  background: var(--tw-amber);
+  color: var(--tw-amber);
+  box-shadow: none;
+}
+
+:root:not([data-ui-theme='cyber']) #north-up-view .camera-compass-n {
+  color: var(--tw-amber);
+}
+
+/* Voice control is off by default in the Taiwan edition. */
+#gev-voice-control[hidden] {
+  display: none !important;
+}

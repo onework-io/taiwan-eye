@@ -88,6 +88,8 @@ export class RealtimeInput {
         this.pushToTalkHoldTimer = null;
         if (holdGeneration !== this.pushToTalkHoldGeneration) return;
         if (!this.spaceKeyHeld || this.pushToTalkKeyHeld) return;
+        // Voice switched off (Taiwan edition default): leave Space alone.
+        if (this.ui?.root?.hidden) return;
         // A pointer or Tab focus change during the delay cancels the original
         // gesture rather than letting voice claim a key held for another owner.
         if (document.activeElement !== this.pushToTalkHoldFocusOwner) return;
