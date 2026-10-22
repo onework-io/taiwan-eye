@@ -2971,5 +2971,11 @@
   "Taiwan cell tower request failed": "Falló la solicitud de antenas de Taiwán",
   "{count} tower sites (positions as of {asOf})": "{count} emplazamientos (posiciones de {asOf})",
   "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}: 4G {g4} · 5G {g5}",
-  "Malformed Taiwan cell tower snapshot": "Datos de antenas de Taiwán con formato incorrecto"
+  "Malformed Taiwan cell tower snapshot": "Datos de antenas de Taiwán con formato incorrecto",
+  "Looking up location…": "Buscando la ubicación…",
+  "Location unavailable": "Ubicación no disponible",
+  "{count} other sites within {radius} · nearest {nearest}": "{count} emplazamientos más a menos de {radius} · el más cercano a {nearest}",
+  "NCC {county} ({period}): 4G {g4} · 5G {g5}": "NCC {county} ({period}): 4G {g4} · 5G {g5}",
+  "Position from the {asOf} community snapshot; operator not recorded": "Posición de la instantánea comunitaria de {asOf}; sin operador registrado",
+  "Cell tower site #{number}": "Emplazamiento de antena n.º {number}"
 }

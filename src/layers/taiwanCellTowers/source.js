@@ -24,5 +24,21 @@ export function createTaiwanCellTowersSource({
         throw new Error(msg('Malformed Taiwan cell tower snapshot'));
       return readCellSnapshot(payload);
     },
+
+    /** County and district for one point (OpenStreetMap, via the provider). */
+    async whereIs(lat, lon, { signal } = {}) {
+      const params = new URLSearchParams({
+        lat: lat.toFixed(5),
+        lon: lon.toFixed(5),
+      });
+      const response = await fetchImpl(
+        `/api/taiwan-cell-towers/where?${params}`,
+        { signal },
+      );
+      if (!response.ok) throw new Error(`Place lookup HTTP ${response.status}`);
+      const body = await readResponseJsonCapped(response, 64 * 1024, signal);
+      const text = (value) => String(value || '').slice(0, 80);
+      return { county: text(body?.county), district: text(body?.district) };
+    },
   };
 }

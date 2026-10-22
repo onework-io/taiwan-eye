@@ -179,6 +179,63 @@ export function createNominatimSearchProvider({
 
 export const fetchNominatimSearch = createNominatimSearchProvider();
 
+/** Pick a county-level and a district-level name out of a Nominatim address. */
+export function taiwanAddressParts(address = {}) {
+  const pick = (...keys) =>
+    keys.map((key) => String(address?.[key] || '').trim()).find(Boolean) || '';
+  return {
+    county: pick('city', 'county', 'state'),
+    district: pick('suburb', 'city_district', 'town', 'village', 'district'),
+  };
+}
+
+/**
+ * Reverse-geocode one point to county and district (Taiwan edition, used by
+ * the cell-tower card). Shares the one-request-per-second queue with forward
+ * search and caches by ~100 m cell, since nearby towers share a district.
+ */
+export function createNominatimReverseProvider({
+  endpoint = 'https://nominatim.openstreetmap.org/reverse',
+  requestJson = fetchRegionalJson,
+  language = 'zh-TW',
+} = {}) {
+  const cache = new Map();
+  const inFlight = new Map();
+  return async function reverse(lat, lon, { signal } = {}) {
+    const key = `${lat.toFixed(3)},${lon.toFixed(3)}`;
+    const cached = cache.get(key);
+    if (cached) return cached;
+    const { promise } = coalesceProxyRequest(inFlight, key, async () => {
+      const params = new URLSearchParams({
+        format: 'jsonv2',
+        lat: lat.toFixed(5),
+        lon: lon.toFixed(5),
+        zoom: '14',
+        addressdetails: '1',
+        'accept-language': language,
+      });
+      const row = await enqueueNominatim(
+        () =>
+          requestJson(`${endpoint}?${params}`, {
+            headers: NOMINATIM_HEADERS,
+            redirect: 'error',
+          }),
+        { bounded: true, signal },
+      );
+      const result = {
+        ...taiwanAddressParts(row?.address),
+        label: String(row?.display_name || '').slice(0, 200),
+      };
+      cache.set(key, result);
+      while (cache.size > 500) cache.delete(cache.keys().next().value);
+      return result;
+    });
+    return await promise;
+  };
+}
+
+export const fetchNominatimReverse = createNominatimReverseProvider();
+
 /** Vite plugin: last-resort place search over the public Nominatim instance. */
 export function geocodeProxy({ search = fetchNominatimSearch } = {}) {
   const limiter = makeRateLimiter({

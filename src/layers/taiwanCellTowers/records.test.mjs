@@ -5,6 +5,8 @@ import {
   periodRank,
   summarizeNccStats,
   readCellSnapshot,
+  towerNeighborhood,
+  normalizeCounty,
 } from './records.js';
 
 test('the community tower script parses to de-duplicated Taiwan points', () => {
@@ -72,6 +74,13 @@ test('NCC statistics keep only the latest period and skip roll-up rows', () => {
   assert.deepEqual(summary.byTech, { '4G': 1200, '5G': 1100 });
   assert.deepEqual(summary.byOperator, { 中華電信: 2000, 台灣大哥大: 300 });
   assert.equal(summary.total, 2300);
+  // Per-county breakdown, keyed by the 臺 spelling OSM and NCC both map to.
+  assert.deepEqual(summary.byCounty['臺北市'], {
+    total: 2000,
+    byTech: { '4G': 1200, '5G': 800 },
+    byOperator: { 中華電信: 2000 },
+  });
+  assert.equal(summary.byCounty['新北市'].byTech['5G'], 300);
   // A wrapped payload works too, and nothing usable is null.
   assert.equal(
     summarizeNccStats({ data: [{ 統計期: '115年9月', 類別: '4G', 基地臺: 5 }] })
@@ -92,4 +101,18 @@ test('the browser drops malformed points and keeps the stats', () => {
   assert.equal(snap.pointsAsOf, '2016-05');
   assert.equal(snap.stats.period, '115年9月');
   assert.deepEqual(snap.errors, ['stats: HTTP 503']);
+});
+
+test('county names normalise 台 to 臺', () => {
+  assert.equal(normalizeCounty(' 台北市 '), '臺北市');
+  assert.equal(normalizeCounty('臺中市'), '臺中市');
+});
+
+test('a tower neighbourhood counts sites in range and finds the nearest', () => {
+  // ~111 m and ~333 m north of the first site, and one ~2.2 km away.
+  const points = [121.5, 25.0, 121.5, 25.001, 121.5, 25.003, 121.5, 25.02];
+  const near = towerNeighborhood(points, 0, 500);
+  assert.equal(near.within, 2);
+  assert.ok(Math.abs(near.nearestM - 111.3) < 1, String(near.nearestM));
+  assert.equal(towerNeighborhood([121.5, 25.0], 0, 500).nearestM, null);
 });

@@ -8,7 +8,8 @@
 /** Taiwan and its outlying islands, generously. */
 const BOUNDS = { west: 117.0, east: 123.0, south: 21.0, north: 27.0 };
 
-const inTaiwan = (lon, lat) =>
+/** Whether a point is in Taiwan or its outlying islands. */
+export const isTaiwanPoint = (lon, lat) =>
   Number.isFinite(lon) &&
   Number.isFinite(lat) &&
   lon >= BOUNDS.west &&
@@ -34,13 +35,49 @@ export function parseTowerScript(text) {
   for (const icon of icons) {
     const lon = Math.round(Number(icon?.longitude) * 1e5) / 1e5;
     const lat = Math.round(Number(icon?.latitude) * 1e5) / 1e5;
-    if (!inTaiwan(lon, lat)) continue;
+    if (!isTaiwanPoint(lon, lat)) continue;
     const key = `${lon},${lat}`;
     if (seen.has(key)) continue;
     seen.add(key);
     flat.push(lon, lat);
   }
   return flat;
+}
+
+/** One spelling for county names: NCC and OSM disagree on 台/臺. */
+export function normalizeCounty(name) {
+  return String(name || '')
+    .trim()
+    .replace(/台/g, '臺');
+}
+
+/**
+ * Neighbourhood of one site, by brute force over the flat array (84k points
+ * is a millisecond). Distances use an equirectangular approximation, which is
+ * far inside a metre at these ranges.
+ * @returns {{within: number, nearestM: number|null}}
+ */
+export function towerNeighborhood(points, index, radiusM = 500) {
+  const lon0 = points[index * 2];
+  const lat0 = points[index * 2 + 1];
+  const mPerDegLat = 111_320;
+  const mPerDegLon = 111_320 * Math.cos((lat0 * Math.PI) / 180);
+  const dLatMax = radiusM / mPerDegLat;
+  let within = 0;
+  let nearest = Infinity;
+  for (let i = 0; i + 1 < points.length; i += 2) {
+    if (i === index * 2) continue;
+    const dy = (points[i + 1] - lat0) * mPerDegLat;
+    const dx = (points[i] - lon0) * mPerDegLon;
+    const d2 = dx * dx + dy * dy;
+    if (d2 < nearest) nearest = d2;
+    if (Math.abs(points[i + 1] - lat0) <= dLatMax && d2 <= radiusM * radiusM)
+      within += 1;
+  }
+  return {
+    within,
+    nearestM: Number.isFinite(nearest) ? Math.sqrt(nearest) : null,
+  };
 }
 
 const numberOf = (value) => {
@@ -125,8 +162,19 @@ export function summarizeNccStats(payload) {
     byTech[tech] = (byTech[tech] || 0) + row.count;
     if (row.operator)
       byOperator[row.operator] = (byOperator[row.operator] || 0) + row.count;
-    if (row.county)
-      byCounty[row.county] = (byCounty[row.county] || 0) + row.count;
+    if (row.county) {
+      const county = normalizeCounty(row.county);
+      const entry = (byCounty[county] ||= {
+        total: 0,
+        byTech: {},
+        byOperator: {},
+      });
+      entry.total += row.count;
+      entry.byTech[tech] = (entry.byTech[tech] || 0) + row.count;
+      if (row.operator)
+        entry.byOperator[row.operator] =
+          (entry.byOperator[row.operator] || 0) + row.count;
+    }
     total += row.count;
   }
   return { period: latest, total, byTech, byOperator, byCounty };
@@ -139,7 +187,7 @@ export function readCellSnapshot(payload) {
   for (let i = 0; i + 1 < raw.length; i += 2) {
     const lon = Number(raw[i]);
     const lat = Number(raw[i + 1]);
-    if (inTaiwan(lon, lat)) points.push(lon, lat);
+    if (isTaiwanPoint(lon, lat)) points.push(lon, lat);
   }
   const stats =
     payload?.stats && typeof payload.stats === 'object' ? payload.stats : null;

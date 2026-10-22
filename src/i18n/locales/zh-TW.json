@@ -2837,5 +2837,11 @@
   "Taiwan cell tower request failed": "台灣基地台請求失敗",
   "{count} tower sites (positions as of {asOf})": "{count} 個基地台站點（位置資料 {asOf}）",
   "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}：4G {g4} · 5G {g5}",
-  "Malformed Taiwan cell tower snapshot": "台灣基地台資料格式錯誤"
+  "Malformed Taiwan cell tower snapshot": "台灣基地台資料格式錯誤",
+  "Looking up location…": "正在查詢所在地…",
+  "Location unavailable": "無法取得所在地",
+  "{count} other sites within {radius} · nearest {nearest}": "半徑 {radius} 內另有 {count} 個站點 · 最近 {nearest}",
+  "NCC {county} ({period}): 4G {g4} · 5G {g5}": "NCC {county}（{period}）：4G {g4} · 5G {g5}",
+  "Position from the {asOf} community snapshot; operator not recorded": "位置取自 {asOf} 社群資料，未記錄業者",
+  "Cell tower site #{number}": "基地台站點 #{number}"
 }

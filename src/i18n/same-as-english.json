@@ -122,7 +122,8 @@
     "ΔE",
     "ΔN",
     "▲ {frp} MW",
-    "NCC {period}: 4G {g4} · 5G {g5}"
+    "NCC {period}: 4G {g4} · 5G {g5}",
+    "NCC {county} ({period}): 4G {g4} · 5G {g5}"
   ],
   "ru": [
     "AIS: --",
@@ -139,7 +140,8 @@
     "REC",
     "VS",
     "WHOT/BHOT",
-    "NCC {period}: 4G {g4} · 5G {g5}"
+    "NCC {period}: 4G {g4} · 5G {g5}",
+    "NCC {county} ({period}): 4G {g4} · 5G {g5}"
   ],
   "zh-TW": [
     "1090 MHz",

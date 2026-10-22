@@ -3038,5 +3038,11 @@
   "Taiwan cell tower request failed": "Ошибка запроса базовых станций Тайваня",
   "{count} tower sites (positions as of {asOf})": "{count} площадок (координаты на {asOf})",
   "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}: 4G {g4} · 5G {g5}",
-  "Malformed Taiwan cell tower snapshot": "Некорректные данные базовых станций Тайваня"
+  "Malformed Taiwan cell tower snapshot": "Некорректные данные базовых станций Тайваня",
+  "Looking up location…": "Определение местоположения…",
+  "Location unavailable": "Местоположение недоступно",
+  "{count} other sites within {radius} · nearest {nearest}": "Ещё {count} площадок в радиусе {radius} · ближайшая в {nearest}",
+  "NCC {county} ({period}): 4G {g4} · 5G {g5}": "NCC {county} ({period}): 4G {g4} · 5G {g5}",
+  "Position from the {asOf} community snapshot; operator not recorded": "Координаты из общественного снимка {asOf}; оператор не указан",
+  "Cell tower site #{number}": "Площадка базовой станции № {number}"
 }

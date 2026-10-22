@@ -46,3 +46,34 @@ test('fresh parts are served from cache', async () => {
   assert.equal(calls, 2);
   assert.equal(second.stats.byTech['5G'], 3);
 });
+
+test('/where reverse-geocodes a Taiwan point and refuses others', async () => {
+  const calls = [];
+  const proxy = taiwanCellTowersProxy({
+    fetchImpl: async () => new Response('no', { status: 503 }),
+    reverse: async (lat, lon) => {
+      calls.push([lat, lon]);
+      return { county: '臺北市', district: '中正區', label: 'x' };
+    },
+  });
+  const call = (url) =>
+    new Promise((resolve) => {
+      const res = {
+        writableEnded: false,
+        writeHead(status) {
+          this.status = status;
+        },
+        end(body) {
+          this.writableEnded = true;
+          resolve({ status: this.status, body: JSON.parse(body) });
+        },
+        on() {},
+      };
+      proxy._handler({ method: 'GET', url, headers: {}, socket: {} }, res);
+    });
+  const ok = await call('/where?lat=25.04410&lon=121.50187');
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.county, '臺北市');
+  assert.deepEqual(calls, [[25.0441, 121.50187]]);
+  assert.equal((await call('/where?lat=48.8&lon=2.3')).status, 400);
+});

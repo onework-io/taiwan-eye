@@ -135,6 +135,10 @@ test('every scene click handler consults ownership before it picks', () => {
       'viewer.scene.pick(click.position)',
     ],
     ['src/layers/vessels/selection.js', 'viewer.scene.pick(click.position)'],
+    [
+      'src/layers/taiwanCellTowers/index.js',
+      '_viewer.scene.pick(click.position)',
+    ],
   ];
   for (const [file, firstPick] of guarded) {
     const source = read(file);

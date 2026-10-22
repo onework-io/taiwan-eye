@@ -4,10 +4,12 @@
 // counts. Both are keyless; each part fails on its own and keeps its last good
 // value for a day.
 import {
+  isTaiwanPoint,
   parseTowerScript,
   summarizeNccStats,
 } from '../../src/layers/taiwanCellTowers/records.js';
 import { readResponseJsonCapped } from './common/http.js';
+import { fetchNominatimReverse } from './regional/place.js';
 import { makeRateLimiter, clientKey } from './common/rate-limit.js';
 
 export const TOWER_POSITIONS_URL =
@@ -51,8 +53,16 @@ async function readTextCapped(response, cap) {
 export function taiwanCellTowersProxy({
   fetchImpl = (...args) => globalThis.fetch(...args),
   now = () => Date.now(),
+  reverse = fetchNominatimReverse,
 } = {}) {
   const allow = makeRateLimiter({ windowMs: 60_000, max: 20, globalMax: 300 });
+  // Clicks on towers: Nominatim allows one request a second, and its queue
+  // refuses beyond a few waiting, so this only guards against a runaway client.
+  const allowWhere = makeRateLimiter({
+    windowMs: 60_000,
+    max: 40,
+    globalMax: 120,
+  });
   const parts = {
     points: { value: null, at: 0, error: null },
     stats: { value: null, at: 0, error: null },
@@ -116,6 +126,28 @@ export function taiwanCellTowersProxy({
     };
   }
 
+  /** County and district for one clicked tower, via Nominatim reverse. */
+  async function where(req, res, url, json) {
+    if (!allowWhere(clientKey(req)))
+      return json(429, { error: 'rate_limited' });
+    const lat = Number(url.searchParams.get('lat'));
+    const lon = Number(url.searchParams.get('lon'));
+    if (!isTaiwanPoint(lon, lat)) return json(400, { error: 'bad_point' });
+    const abandoned = new AbortController();
+    res.on?.('close', () => abandoned.abort());
+    try {
+      const place = await reverse(lat, lon, { signal: abandoned.signal });
+      if (res.writableEnded) return;
+      json(200, place);
+    } catch (error) {
+      if (res.writableEnded) return;
+      const busy =
+        error?.code === 'NOMINATIM_QUEUE_FULL' ||
+        error?.code === 'NOMINATIM_ABANDONED';
+      json(busy ? 429 : 503, { error: busy ? 'busy' : 'unavailable' });
+    }
+  }
+
   async function handler(req, res) {
     const json = (status, body) => {
       res.writeHead(status, {
@@ -125,7 +157,9 @@ export function taiwanCellTowersProxy({
       res.end(JSON.stringify(body));
     };
     if (req.method !== 'GET') return json(405, { error: 'method_not_allowed' });
-    const path = new URL(req.url || '/', 'http://localhost').pathname;
+    const url = new URL(req.url || '/', 'http://localhost');
+    const path = url.pathname;
+    if (path === '/where') return where(req, res, url, json);
     if (path !== '/' && path !== '')
       return json(404, { error: 'unknown_route' });
     if (!allow(clientKey(req))) return json(429, { error: 'rate_limited' });
@@ -147,5 +181,6 @@ export function taiwanCellTowersProxy({
     },
     // For tests.
     _snapshot: snapshot,
+    _handler: handler,
   };
 }
