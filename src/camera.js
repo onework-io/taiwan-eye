@@ -81,5 +81,23 @@ export function flyToTaiwan(viewer) {
   };
 }
 
+/**
+ * Frame the whole of Taiwan (the first-run 台灣水情 tile), tilted a little so
+ * reservoir and river labels read as a map rather than a flat sheet.
+ */
+export function flyToTaiwanOverview(viewer) {
+  if (!viewer || viewer.isDestroyed?.()) return;
+  viewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(120.9, 21.75, 330000),
+    orientation: {
+      heading: Cesium.Math.toRadians(0),
+      pitch: Cesium.Math.toRadians(-58),
+      roll: 0.0,
+    },
+    duration: 3.5,
+    easingFunction: Cesium.EasingFunction.CUBIC_IN_OUT,
+  });
+}
+
 /** Upstream name, kept so upstream tests and callers still resolve. */
 export const flyToAustin = flyToTaiwan;

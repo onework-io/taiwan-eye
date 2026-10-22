@@ -13,28 +13,27 @@
          like something you should not have access to → the sources are all
          public → the data is real. Tile subcopy stays purely functional. -->
     <p id="first-run-description" data-i18n-runtime>It feels like a forbidden cockpit—then you realize the sources are public and the data is real.</p>
+    <!-- Taiwan edition: every tile is a Taiwan open-data feed (space missions,
+         global contacts and USGS/NASA events are gone from the menu; they stay
+         reachable from the layer panel). Table: src/firstRunExperience.js. -->
     <div class="first-run-choices">
-      <button type="button" data-first-run-choice="contacts">
-        <span class="material-symbols-outlined" aria-hidden="true">radar</span>
-        <span><strong data-i18n>LIVE CONTACTS</strong><small data-i18n>Aircraft, vessels and nearby intelligence</small></span>
+      <button type="button" data-first-run-choice="taiwan-water">
+        <span class="tw-icon tw-icon-water" aria-hidden="true"></span>
+        <span><strong data-i18n>TAIWAN WATER</strong><small data-i18n>River levels, flood sensors and reservoirs, from WRA and Civil IoT Taiwan</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>
-      <button type="button" data-first-run-choice="space-missions">
-        <span class="material-symbols-outlined" aria-hidden="true">rocket_launch</span>
-        <span><strong data-i18n>SPACE MISSIONS</strong><small data-i18n>Launches, spacecraft and orbital context</small></span>
+      <button type="button" data-first-run-choice="taiwan-traffic">
+        <span class="tw-icon tw-icon-cctv" aria-hidden="true"></span>
+        <span><strong data-i18n>TRAFFIC CAMERAS</strong><small data-i18n>Highway and road CCTV, plus Taipei YouBike stations</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>
-      <button type="button" data-first-run-choice="environmental">
-        <span class="material-symbols-outlined" aria-hidden="true">local_fire_department</span>
-        <!-- Title text is painted from ENVIRONMENTAL_LABEL_CHOICE at init. -->
-        <!-- Subcopy names BOTH feeds this tile turns on, because the launcher
-             optimizes for the fully configured experience (owner ruling,
-             2026-08-23) — see the mission table in src/firstRunExperience.js. -->
-        <span data-i18n-runtime><strong data-first-run-environmental-title>ENVIRONMENTAL</strong><small>Live earthquakes and active fires, from USGS and NASA</small></span>
+      <button type="button" data-first-run-choice="taiwan-3d">
+        <span class="tw-icon tw-icon-city3d" aria-hidden="true"></span>
+        <span><strong data-i18n>TAIPEI IN 3D</strong><small data-i18n>NLSC 3D buildings, starting at Taipei 101</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>
       <button type="button" class="first-run-explore" data-first-run-choice="explore">
-        <span class="material-symbols-outlined" aria-hidden="true">public</span>
+        <span class="tw-icon tw-icon-globe-reset" aria-hidden="true"></span>
         <span><strong data-i18n>EXPLORE MANUALLY</strong><small data-i18n>Begin with a clean globe</small></span>
         <span class="material-symbols-outlined first-run-arrow" aria-hidden="true">arrow_forward</span>
       </button>

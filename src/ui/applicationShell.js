@@ -834,12 +834,9 @@ export class StyleManager extends ShellFacade {
     );
     if (standbyDescription) {
       standbyDescription.replaceChildren(
+        // Taiwan edition: the Space Missions tab is hidden, so only Contacts.
         document.createTextNode(
           t('CONTACTS — nearest planes · vessels · sites'),
-        ),
-        document.createElement('br'),
-        document.createTextNode(
-          t('SPACE MISSIONS — launches & orbital assets'),
         ),
       );
     }

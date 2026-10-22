@@ -105,3 +105,28 @@
 #gev-voice-control[hidden] {
   display: none !important;
 }
+
+.tw-icon-water {
+  mask-image: url('/ui-icons/water.svg');
+  -webkit-mask-image: url('/ui-icons/water.svg');
+}
+.tw-icon-cctv {
+  mask-image: url('/ui-icons/cctv.svg');
+  -webkit-mask-image: url('/ui-icons/cctv.svg');
+}
+.tw-icon-city3d {
+  mask-image: url('/ui-icons/city3d.svg');
+  -webkit-mask-image: url('/ui-icons/city3d.svg');
+}
+
+/* First-run tiles: the line icons take the slot the font glyphs used. */
+.first-run-choices button > .tw-icon:first-child {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: #55dff5;
+}
+
+/* Taiwan edition: no Space Missions tab in the Context panel. */
+#global-context-missions-btn {
+  display: none !important;
+}

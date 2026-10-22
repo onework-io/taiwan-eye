@@ -6,12 +6,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import {
-  ENVIRONMENTAL_LABEL_CHOICE,
   EXCLUSIVE_SURFACE_CLASSES,
   FIRST_RUN_MISSIONS,
   FIRST_RUN_SESSION_KEY,
   FIRST_RUN_STORAGE_KEY,
-  environmentalLabel,
   exclusiveSurfaceActive,
   rememberFirstRunSessionDismissed,
   runFirstRunChoice,
@@ -558,7 +556,13 @@ function missionSpy({
   layerResult = () => true,
   globe = async () => ({ ok: true }),
 } = {}) {
-  const calls = { contextModes: [], layerIds: [], globeFlights: 0 };
+  const calls = {
+    contextModes: [],
+    layerIds: [],
+    globeFlights: 0,
+    flights: [],
+    buildings3d: [],
+  };
   return {
     calls,
     deps: {
@@ -576,112 +580,84 @@ function missionSpy({
         calls.globeFlights += 1;
         return globe();
       },
+      flyTo: async (target) => {
+        calls.flights.push(target);
+        return globe();
+      },
+      setBuildings3d: (enabled) => calls.buildings3d.push(enabled),
     },
   };
 }
 
-test('the menu is the four owner-ordered missions', () => {
-  // INFRASTRUCTURE was removed after the owner playtested it: enabling all
-  // three bundled layers at once put ~5,700 entities on a full-earth view and
-  // tanked the frame rate. The layers stay reachable by hand and by voice; what
-  // went is the one-click globe-scale dump. Restoring the tile needs the
-  // globe-LOD declutter first.
+test('the menu is the Taiwan open-data missions, in order', () => {
+  // Taiwan edition: space missions, global contacts and the USGS/NASA tile are
+  // gone from the launcher; every tile is a Taiwan open-data feed.
   assert.deepEqual(Object.keys(FIRST_RUN_MISSIONS), [
-    'contacts',
-    'space-missions',
-    'environmental',
+    'taiwan-water',
+    'taiwan-traffic',
+    'taiwan-3d',
     'explore',
   ]);
-  assert.equal(
-    FIRST_RUN_MISSIONS.infrastructure,
-    undefined,
-    'the infrastructure mission must be gone, not dormant',
-  );
-});
-
-test('Live Contacts and Space Missions go through the one setContextMode facade', async () => {
-  for (const [choice, mode] of [
-    ['contacts', 'contacts'],
-    ['space-missions', 'space-missions'],
+  for (const gone of [
+    'space-missions',
+    'contacts',
+    'environmental',
+    'infrastructure',
   ]) {
-    const spy = missionSpy();
-    const outcome = await runFirstRunChoice(choice, spy.deps);
-    assert.equal(outcome.ok, true);
-    assert.deepEqual(spy.calls.contextModes, [mode]);
-    // A Context mission owns no layers and no camera of its own — the facade does.
-    assert.deepEqual(spy.calls.layerIds, []);
-    assert.equal(spy.calls.globeFlights, 0);
+    assert.equal(FIRST_RUN_MISSIONS[gone], undefined, `${gone} must be gone`);
   }
 });
 
-test('Environmental enables BOTH its feeds and pulls out to the globe', async () => {
+test('Taiwan water enables its layer and frames the whole island', async () => {
   const spy = missionSpy();
-  const outcome = await runFirstRunChoice('environmental', spy.deps);
+  const outcome = await runFirstRunChoice('taiwan-water', spy.deps);
   assert.equal(outcome.ok, true);
-  assert.deepEqual(spy.calls.layerIds, ['earthquakes', 'local-firms']);
-  assert.equal(spy.calls.globeFlights, 1);
+  assert.deepEqual(spy.calls.layerIds, ['taiwan-water']);
+  assert.deepEqual(spy.calls.flights, ['taiwan']);
+  assert.equal(spy.calls.globeFlights, 0);
+  assert.deepEqual(spy.calls.buildings3d, []);
 });
 
-test('the tile is the FULLY CONFIGURED experience: quakes and fires together', () => {
-  // Owner ruling, 2026-08-23: the launcher optimizes for the configured app, so
-  // ENVIRONMENTAL means live USGS earthquakes AND NASA FIRMS active fires.
-  const environmental = FIRST_RUN_MISSIONS.environmental;
-  assert.deepEqual(environmental.layerIds, ['earthquakes', 'local-firms']);
-
-  // Keyless, the honest surface is the LAYER ROW ("KEY REQUIRED"), which the
-  // FIRMS layer already reports. The misleading part is the GLOBAL chip folding
-  // that row into LOAD FAILED — a defect in the shared state machine, ledgered
-  // post-launch, and the note must stay where the next editor will read it
-  // rather than being re-discovered as a launcher bug.
-  const module = fs.readFileSync(
-    new URL('./firstRunExperience.js', import.meta.url),
-    'utf8',
-  );
-  const table = module.slice(
-    module.indexOf('  environmental: Object.freeze({'),
-    module.indexOf('  explore:'),
-  );
-  assert.match(table, /KEY REQUIRED/);
-  assert.match(table, /src\/loadingFeedback\.js/);
-  assert.match(table, /LEDGERED post-launch/);
+test('Traffic cameras enables CCTV and YouBike over Taipei', async () => {
+  const spy = missionSpy();
+  const outcome = await runFirstRunChoice('taiwan-traffic', spy.deps);
+  assert.equal(outcome.ok, true);
+  assert.deepEqual(spy.calls.layerIds, ['cctv', 'bikeshare']);
+  assert.deepEqual(spy.calls.flights, ['taipei']);
 });
 
-test('every visitor gets the same tile — there is no degraded keyless variant', async () => {
-  // The mission does not branch on configuration: it asks for both layers for
-  // everyone, and a keyless FIRMS reports its own state at its own row rather
-  // than changing what the tile does.
-  const spy = missionSpy({ layerResult: () => true });
-  const outcome = await runFirstRunChoice('environmental', spy.deps);
+test('Taipei in 3D turns on the NLSC buildings and flies to Taipei', async () => {
+  const spy = missionSpy();
+  const outcome = await runFirstRunChoice('taiwan-3d', spy.deps);
   assert.equal(outcome.ok, true);
-  assert.deepEqual(outcome.failedLayerIds, []);
-  assert.deepEqual(spy.calls.layerIds, ['earthquakes', 'local-firms']);
-  const module = fs.readFileSync(
-    new URL('./firstRunExperience.js', import.meta.url),
-    'utf8',
-  );
-  assert.doesNotMatch(
-    module.slice(module.indexOf('export async function runFirstRunChoice')),
-    /FIRMS_MAP_KEY|hasKey|keyless\s*\?/,
-    'the mission must not fork on whether a key is configured',
-  );
+  assert.deepEqual(spy.calls.layerIds, []);
+  assert.deepEqual(spy.calls.buildings3d, [true]);
+  assert.deepEqual(spy.calls.flights, ['taipei']);
 });
 
 test('a refused layer fails the mission by name, and a stalled flight never does', async () => {
-  const refused = missionSpy({ layerResult: (id) => id !== 'earthquakes' });
-  const outcome = await runFirstRunChoice('environmental', refused.deps);
+  const refused = missionSpy({ layerResult: (id) => id !== 'cctv' });
+  const outcome = await runFirstRunChoice('taiwan-traffic', refused.deps);
   assert.equal(outcome.ok, false);
-  assert.deepEqual(outcome.failedLayerIds, ['earthquakes']);
+  assert.deepEqual(outcome.failedLayerIds, ['cctv']);
 
-  // The globe flight is framing. A cancelled or throwing flight is not a failure.
+  // The flight is framing. A cancelled or throwing flight is not a failure.
   const flightDown = missionSpy({
     globe: () => {
       throw new Error('cancelled');
     },
   });
   assert.equal(
-    (await runFirstRunChoice('environmental', flightDown.deps)).ok,
+    (await runFirstRunChoice('taiwan-water', flightDown.deps)).ok,
     true,
   );
+});
+
+test('without a flyTo dependency a globe mission falls back to the globe view', async () => {
+  const spy = missionSpy();
+  const { flyTo: _unused, ...deps } = spy.deps;
+  assert.equal((await runFirstRunChoice('taiwan-water', deps)).ok, true);
+  assert.equal(spy.calls.globeFlights, 1);
 });
 
 test('Explore manually touches nothing at all, and an unknown choice is inert', async () => {
@@ -691,31 +667,17 @@ test('Explore manually touches nothing at all, and an unknown choice is inert', 
     contextModes: [],
     layerIds: [],
     globeFlights: 0,
+    flights: [],
+    buildings3d: [],
   });
   assert.equal((await runFirstRunChoice('nope', spy.deps)).ok, false);
   assert.deepEqual(spy.calls, {
     contextModes: [],
     layerIds: [],
     globeFlights: 0,
+    flights: [],
+    buildings3d: [],
   });
-});
-
-test('a failed Context mission reports the layers the facade named', async () => {
-  const spy = missionSpy({ contextOk: false });
-  const outcome = await runFirstRunChoice('space-missions', spy.deps);
-  assert.equal(outcome.ok, false);
-  assert.deepEqual(outcome.result.failedLayerIds, ['rocket-launches']);
-});
-
-test('the fires/quakes tile name is switchable from one constant', () => {
-  assert.equal(environmentalLabel('ENVIRONMENTAL').title, 'ENVIRONMENTAL');
-  assert.equal(environmentalLabel('EARTH_WATCH').title, 'EARTH WATCH');
-  assert.equal(environmentalLabel('ACTIVE_EVENTS').title, 'ACTIVE EVENTS');
-  assert.equal(environmentalLabel('nonsense').title, 'ENVIRONMENTAL');
-  assert.equal(
-    environmentalLabel().title,
-    environmentalLabel(ENVIRONMENTAL_LABEL_CHOICE).title,
-  );
 });
 
 // ── Defaults interplay: what a mission is allowed to persist ─────────────────
@@ -813,23 +775,11 @@ test('markup, startup ordering and accessibility remain pinned', () => {
     /data-first-run-status[^>]*role="status"[^>]*aria-live="polite"/,
   );
   assert.match(html, /<input type="checkbox" data-first-run-suppress \/>/);
-  assert.match(html, /<strong data-first-run-environmental-title>/);
-  // Subcopy must name BOTH feeds the tile turns on — a tile that promised only
-  // half of what it does is the defect this replaced. Only the VISIBLE <small>
-  // text counts; the comment beside it naturally says the words too.
-  const envTile = html.slice(
-    html.indexOf('data-first-run-choice="environmental"'),
-  );
-  const visible = envTile.slice(
-    envTile.indexOf('<small>'),
-    envTile.indexOf('</small>'),
-  );
-  assert.match(visible, /earthquakes/i);
-  assert.match(
-    visible,
-    /fires?/i,
-    'the tile must promise the fires it enables',
-  );
+  // Every tile names the Taiwan source it turns on.
+  assert.match(html, /WRA and Civil IoT Taiwan/);
+  assert.match(html, /YouBike/);
+  assert.match(html, /NLSC 3D buildings/);
+  assert.doesNotMatch(html, /data-first-run-choice="space-missions"/);
 
   // The card's one persuasive line is OWNER-AUTHORED and pinned verbatim,
   // unspaced em dash included. This is copy, not prose to be improved in a
@@ -843,13 +793,13 @@ test('markup, startup ordering and accessibility remain pinned', () => {
   );
 
   // Menu order is the owner's, read straight off the markup.
-  const order = [...html.matchAll(/data-first-run-choice="([a-z-]+)"/g)].map(
+  const order = [...html.matchAll(/data-first-run-choice="([a-z0-9-]+)"/g)].map(
     (match) => match[1],
   );
   assert.deepEqual(order, [
-    'contacts',
-    'space-missions',
-    'environmental',
+    'taiwan-water',
+    'taiwan-traffic',
+    'taiwan-3d',
     'explore',
   ]);
   assert.doesNotMatch(

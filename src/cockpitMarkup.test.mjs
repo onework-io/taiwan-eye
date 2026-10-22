@@ -1253,11 +1253,11 @@ test('Global Context uses its dedicated right rail without a duplicate Data Laye
   assert.match(html, /id="global-context-missions-btn"/);
 });
 
-test('Global Context standby describes both chooser modes', () => {
+test('Global Context standby describes Contacts only (Taiwan edition hides Space Missions)', () => {
   const match = html.match(/<div id="context-mode-standby"[\s\S]*?<\/div>/);
   assert.ok(match, 'Global Context standby is missing');
   assert.match(match[0], /CONTACTS — nearest planes · vessels · sites/);
-  assert.match(match[0], /SPACE MISSIONS — launches &amp; orbital assets/);
+  assert.doesNotMatch(match[0], /SPACE MISSIONS/);
 });
 
 test('cockpit briefing cycle control keeps its state as the accessible name', () => {

@@ -15,6 +15,8 @@ import {
 } from '../renderGovernor.js';
 import { describeError } from './errors.js';
 import { createTaiwanBuildingsOverlay } from '../maps/taiwanBuildings.js';
+import { flyToTaiwanOverview } from '../camera.js';
+import { TAIWAN_OVERVIEW_EVENT } from '../firstRunExperience.js';
 import { t } from '../i18n/index.js';
 
 /** Construct the application globe using the caller's local configuration. */
@@ -135,5 +137,11 @@ export async function createApplicationScene({
   });
   defer(() => taiwanBuildings.destroy());
   if (import.meta.env?.DEV) globalThis.__gevTaiwan3d = taiwanBuildings;
+  // The first-run 台灣水情 tile asks for the whole island; the viewer lives here.
+  const onTaiwanOverview = () => flyToTaiwanOverview(viewer);
+  globalThis.addEventListener?.(TAIWAN_OVERVIEW_EVENT, onTaiwanOverview);
+  defer(() =>
+    globalThis.removeEventListener?.(TAIWAN_OVERVIEW_EVENT, onTaiwanOverview),
+  );
   return { viewer, tileset, mapStackController, operations, taiwanBuildings };
 }

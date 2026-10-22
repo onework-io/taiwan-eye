@@ -23,34 +23,15 @@ import { createSurfaceKeyboard } from './ui/surfaceKeyboard.js';
 
 import { t, msg } from './i18n/index.js';
 
+/** Handled in src/app/scene.js, which owns the viewer. */
+export const TAIWAN_OVERVIEW_EVENT = 'gev:taiwan-overview';
+/** Same event the 台灣 3D 建物 chip sends (src/maps/taiwanBuildings.js). */
+const TAIWAN_3D_TOGGLE_EVENT = 'gev:taiwan-3d-toggle';
+
 /** Durable suppression. Written ONLY by the "Don't show this again" checkbox. */
 export const FIRST_RUN_STORAGE_KEY = 'gev:first-run-mission:v1';
 /** Per-session dismissal. Written by every close path; scoped to sessionStorage. */
 export const FIRST_RUN_SESSION_KEY = 'gev:first-run-mission-session:v1';
-
-/**
- * Owner-selectable name for the fires/quakes mission. Flip this ONE constant to
- * re-label the tile; the alternates are pre-written so the choice is a taste
- * call at review time, not an edit.
- * @type {'ENVIRONMENTAL'|'EARTH_WATCH'|'ACTIVE_EVENTS'}
- */
-export const ENVIRONMENTAL_LABEL_CHOICE = 'ENVIRONMENTAL';
-
-const ENVIRONMENTAL_LABEL_KEYS = Object.freeze({
-  ENVIRONMENTAL: msg('ENVIRONMENTAL'),
-  EARTH_WATCH: msg('EARTH WATCH'),
-  ACTIVE_EVENTS: msg('ACTIVE EVENTS'),
-});
-
-/**
- * @param {string} [choice]
- * @returns {{title: string}} The label set the constant above selects.
- */
-export function environmentalLabel(choice = ENVIRONMENTAL_LABEL_CHOICE) {
-  const key =
-    ENVIRONMENTAL_LABEL_KEYS[choice] || ENVIRONMENTAL_LABEL_KEYS.ENVIRONMENTAL;
-  return { title: t(key) };
-}
 
 /*
  * MISSION → APP STATE, AND WHAT IT IS ALLOWED TO PERSIST
@@ -91,35 +72,35 @@ export function environmentalLabel(choice = ENVIRONMENTAL_LABEL_CHOICE) {
  * layer isolation and rollback stay in exactly one place.
  */
 
+/*
+ * TAIWAN EDITION MENU. Every tile is a Taiwan open-data feed; the upstream
+ * Contacts / Space Missions / Environmental (USGS + NASA) tiles are gone from
+ * the launcher and stay reachable from the layer panel. `camera` frames the
+ * feed: 'taiwan' is the whole island, any other value is a city pill id.
+ */
 /** @type {Readonly<Record<string, object>>} */
 export const FIRST_RUN_MISSIONS = Object.freeze({
-  contacts: Object.freeze({
-    kind: 'context',
-    contextMode: 'contacts',
-    busyKey: msg('Starting live contacts…'),
-  }),
-  'space-missions': Object.freeze({
-    kind: 'context',
-    contextMode: 'space-missions',
-    busyKey: msg('Opening space missions…'),
-  }),
-  environmental: Object.freeze({
+  'taiwan-water': Object.freeze({
     kind: 'globe',
-    // Live USGS earthquakes AND NASA FIRMS active fires. The launcher optimizes
-    // for the FULLY CONFIGURED experience (owner ruling, 2026-08-23): the tile
-    // promises both, so it turns on both, and the subcopy in index.html says so.
-    //
-    // Keyless, FIRMS is honest where it counts — its own layer row reads
-    // "UNAVAILABLE · NASA FIRMS · LIVE · KEY REQUIRED", and the quakes half of
-    // the tile still delivers in full. What is NOT honest is the GLOBAL status
-    // chip, which has no key-required terminal state and folds that row into
-    // "LOAD FAILED". That aggregation is the defect, not this preset: fixing it
-    // means a KEY REQUIRED terminal state in src/loadingFeedback.js, a state
-    // machine shared by every layer and not a thing to refactor the night
-    // before a launch. LEDGERED post-launch. Until it lands, keyless visitors
-    // are judged on the layer row, which tells them the truth.
-    layerIds: Object.freeze(['earthquakes', 'local-firms']),
-    busyKey: msg('Scanning active events…'),
+    // WRA river levels + reservoirs and Civil IoT flood sensors, one layer.
+    layerIds: Object.freeze(['taiwan-water']),
+    camera: 'taiwan',
+    busyKey: msg('Loading Taiwan water…'),
+  }),
+  'taiwan-traffic': Object.freeze({
+    kind: 'globe',
+    // THB/NFB highway CCTV and Taipei YouBike 2.0, both keyless.
+    layerIds: Object.freeze(['cctv', 'bikeshare']),
+    camera: 'taipei',
+    busyKey: msg('Loading traffic cameras and YouBike…'),
+  }),
+  'taiwan-3d': Object.freeze({
+    kind: 'globe',
+    // NLSC 3D Tiles are a map overlay, not a data layer.
+    layerIds: Object.freeze([]),
+    buildings3d: true,
+    camera: 'taipei',
+    busyKey: msg('Loading Taipei 3D buildings…'),
   }),
   explore: Object.freeze({ kind: 'none' }),
 });
@@ -269,7 +250,13 @@ export function rememberFirstRunSessionDismissed(sessionStorageRef) {
  */
 export async function runFirstRunChoice(
   choice,
-  { setContextMode, setLayerEnabled, flyToGlobe },
+  {
+    setContextMode,
+    setLayerEnabled,
+    flyToGlobe,
+    flyTo = null,
+    setBuildings3d = null,
+  },
 ) {
   const mission = FIRST_RUN_MISSIONS[choice];
   if (!mission) return { ok: false, choice };
@@ -278,12 +265,21 @@ export async function runFirstRunChoice(
     const result = await setContextMode(mission.contextMode);
     return { ok: Boolean(result?.ok), choice, result };
   }
-  // Globe missions: start the pull-out and the layer work together so the
+  // Globe missions: start the camera move and the layer work together so the
   // camera is already moving while the feeds spin up. The flight is framing,
   // not the mission — a stalled or superseded flight never fails the tile.
   const flight = Promise.resolve()
-    .then(() => flyToGlobe())
+    .then(() =>
+      mission.camera && flyTo ? flyTo(mission.camera) : flyToGlobe(),
+    )
     .catch(() => null);
+  if (mission.buildings3d) {
+    try {
+      setBuildings3d?.(true);
+    } catch {
+      /* The overlay reports its own state on its chip. */
+    }
+  }
   const outcomes = await Promise.all(
     mission.layerIds.map(async (layerId) => {
       try {
@@ -358,21 +354,7 @@ export function initFirstRunExperience({
     return null;
   }
 
-  // The tile name is owner-switchable from one constant, so paint it from the
-  // module rather than trusting the markup to match. The description and the
-  // tile subcopy are data-i18n-runtime in welcome.html and translated here.
-  const environmentalTitle = root.querySelector(
-    '[data-first-run-environmental-title]',
-  );
-  if (environmentalTitle)
-    environmentalTitle.textContent = environmentalLabel().title;
-  const environmentalSub = root.querySelector(
-    '[data-first-run-environmental-title] + small',
-  );
-  if (environmentalSub)
-    environmentalSub.textContent = t(
-      'Live earthquakes and active fires, from USGS and NASA',
-    );
+  // The description is data-i18n-runtime in welcome.html and translated here.
   const description = root.querySelector('#first-run-description');
   if (description)
     description.textContent = t(
@@ -500,6 +482,15 @@ export function initFirstRunExperience({
         setLayerEnabled: (layerId) =>
           dataManager.setEnabled(layerId, true, { origin: 'user' }),
         flyToGlobe: () => styleManager.resetToGlobeView(),
+        // Taiwan edition framing: a city pill, or the whole island.
+        flyTo: (target) =>
+          target === 'taiwan'
+            ? globalThis.dispatchEvent?.(new CustomEvent(TAIWAN_OVERVIEW_EVENT))
+            : styleManager._onCityPillClick?.(target),
+        setBuildings3d: (enabled) =>
+          globalThis.dispatchEvent?.(
+            new CustomEvent(TAIWAN_3D_TOGGLE_EVENT, { detail: { enabled } }),
+          ),
       });
     } catch (error) {
       // A thrown mission is a real defect worth seeing in a bug report; the
