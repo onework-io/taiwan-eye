@@ -2829,5 +2829,13 @@
   "NLSC 3D buildings, starting at Taipei 101": "國土測繪中心 3D 建物，從台北 101 開始",
   "Loading Taiwan water…": "正在載入台灣水情…",
   "Loading traffic cameras and YouBike…": "正在載入交通影像與 YouBike…",
-  "Loading Taipei 3D buildings…": "正在載入台北 3D 建物…"
+  "Loading Taipei 3D buildings…": "正在載入台北 3D 建物…",
+  "CELL TOWERS": "行動基地台",
+  "Mobile base-station sites, with NCC 4G/5G licence counts": "行動通信基地台站點，附 NCC 4G/5G 執照數",
+  "Loading cell towers…": "正在載入行動基地台…",
+  "Taiwan cell towers": "台灣基地台",
+  "Taiwan cell tower request failed": "台灣基地台請求失敗",
+  "{count} tower sites (positions as of {asOf})": "{count} 個基地台站點（位置資料 {asOf}）",
+  "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}：4G {g4} · 5G {g5}",
+  "Malformed Taiwan cell tower snapshot": "台灣基地台資料格式錯誤"
 }

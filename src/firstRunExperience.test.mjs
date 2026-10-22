@@ -595,6 +595,7 @@ test('the menu is the Taiwan open-data missions, in order', () => {
   assert.deepEqual(Object.keys(FIRST_RUN_MISSIONS), [
     'taiwan-water',
     'taiwan-traffic',
+    'taiwan-cell',
     'taiwan-3d',
     'explore',
   ]);
@@ -624,6 +625,14 @@ test('Traffic cameras enables CCTV and YouBike over Taipei', async () => {
   assert.equal(outcome.ok, true);
   assert.deepEqual(spy.calls.layerIds, ['cctv', 'bikeshare']);
   assert.deepEqual(spy.calls.flights, ['taipei']);
+});
+
+test('Cell towers enables the tower layer over the whole island', async () => {
+  const spy = missionSpy();
+  const outcome = await runFirstRunChoice('taiwan-cell', spy.deps);
+  assert.equal(outcome.ok, true);
+  assert.deepEqual(spy.calls.layerIds, ['taiwan-cell-towers']);
+  assert.deepEqual(spy.calls.flights, ['taiwan']);
 });
 
 test('Taipei in 3D turns on the NLSC buildings and flies to Taipei', async () => {
@@ -769,7 +778,7 @@ test('markup, startup ordering and accessibility remain pinned', () => {
     html,
     /id="first-run-launcher" role="dialog"[^>]*aria-labelledby="first-run-title"[^>]*hidden/,
   );
-  assert.equal((html.match(/data-first-run-choice=/g) || []).length, 4);
+  assert.equal((html.match(/data-first-run-choice=/g) || []).length, 5);
   assert.match(
     html,
     /data-first-run-status[^>]*role="status"[^>]*aria-live="polite"/,
@@ -799,6 +808,7 @@ test('markup, startup ordering and accessibility remain pinned', () => {
   assert.deepEqual(order, [
     'taiwan-water',
     'taiwan-traffic',
+    'taiwan-cell',
     'taiwan-3d',
     'explore',
   ]);
@@ -945,10 +955,10 @@ test('the voice TOOL SCHEMA matches the pinned contract — the mission mapping 
   // list descriptions; the missions still ride existing tools.
   // Street Level and GNSS extend the manifest; broadcast caveats describe tracked and analyst aircraft.
   // Air quality (ECCC AQHI) extends the manifest.
-  assert.equal(block.length, 30807, 'serialized tool schema length drifted');
+  assert.equal(block.length, 30892, 'serialized tool schema length drifted');
   assert.equal(
     crypto.createHash('sha256').update(block).digest('hex'),
-    '18394a275d7f4fd3c5ea590287ee9cf9815d41b322ffe3afcb18708ecf32a6d0',
+    '58efc280d9b18f9685f6bdc700bab5f696d432d88eed1ea99b967c9150ac68c0',
     'the first-run missions must ride EXISTING tools: no schema edit, no cache bust',
   );
   const instructions = fs.readFileSync(

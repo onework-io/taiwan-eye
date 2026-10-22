@@ -43,6 +43,7 @@ export const LAYER_NAME_KEYS = Object.freeze({
   directions: msg('Directions'),
   'alpr-cameras': msg('ALPR Cameras'),
   'taiwan-water': msg('Taiwan water'),
+  'taiwan-cell-towers': msg('Taiwan cell towers'),
 });
 
 /** The layer panel's own English names, where they differ from the module's. */

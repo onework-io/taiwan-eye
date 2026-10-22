@@ -121,7 +121,8 @@
     "{value} KM/S",
     "ΔE",
     "ΔN",
-    "▲ {frp} MW"
+    "▲ {frp} MW",
+    "NCC {period}: 4G {g4} · 5G {g5}"
   ],
   "ru": [
     "AIS: --",
@@ -137,7 +138,8 @@
     "R&B",
     "REC",
     "VS",
-    "WHOT/BHOT"
+    "WHOT/BHOT",
+    "NCC {period}: 4G {g4} · 5G {g5}"
   ],
   "zh-TW": [
     "1090 MHz",

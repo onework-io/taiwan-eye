@@ -49,6 +49,7 @@ export const CATALOG_SOURCE_CONTRACTS = Object.freeze({
   'air-quality': contract(['air-quality'], ['getSnapshot']),
   'gnss-integrity': contract(['gnss-integrity'], ['getSnapshot']),
   'taiwan-water': contract(['taiwan-water'], ['getSnapshot']),
+  'taiwan-cell-towers': contract(['taiwan-cell-towers'], ['getSnapshot']),
   cables: contract(['telegeography-submarine-cables'], ['fetch']),
   transit: contract(['transit'], ['requestSnapshot', 'getHistory']),
 });

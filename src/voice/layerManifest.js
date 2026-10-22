@@ -251,6 +251,20 @@ const layers = [
     noQuery: 'map overlay; no countable records',
   },
   {
+    id: 'taiwan-cell-towers',
+    aliases: [
+      'cell tower',
+      'cell towers',
+      'base station',
+      'mobile tower',
+      '基地台',
+      '基地臺',
+      '行動基地台',
+    ],
+    context: false,
+    noQuery: 'tower positions only; no per-site records',
+  },
+  {
     id: 'taiwan-water',
     aliases: [
       'taiwan water',

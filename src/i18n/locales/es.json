@@ -2963,5 +2963,13 @@
   "NLSC 3D buildings, starting at Taipei 101": "Edificios 3D del NLSC, empezando por Taipei 101",
   "Loading Taiwan water…": "Cargando el agua de Taiwán…",
   "Loading traffic cameras and YouBike…": "Cargando cámaras de tráfico y YouBike…",
-  "Loading Taipei 3D buildings…": "Cargando edificios 3D de Taipéi…"
+  "Loading Taipei 3D buildings…": "Cargando edificios 3D de Taipéi…",
+  "CELL TOWERS": "ANTENAS DE TELEFONÍA",
+  "Mobile base-station sites, with NCC 4G/5G licence counts": "Emplazamientos de estaciones base, con el recuento de licencias 4G/5G de la NCC",
+  "Loading cell towers…": "Cargando antenas de telefonía…",
+  "Taiwan cell towers": "Antenas de Taiwán",
+  "Taiwan cell tower request failed": "Falló la solicitud de antenas de Taiwán",
+  "{count} tower sites (positions as of {asOf})": "{count} emplazamientos (posiciones de {asOf})",
+  "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}: 4G {g4} · 5G {g5}",
+  "Malformed Taiwan cell tower snapshot": "Datos de antenas de Taiwán con formato incorrecto"
 }

@@ -226,6 +226,14 @@ export const DATA_CREDITS = [
       '(Open Government Data License v1.0)',
   },
   {
+    key: 'taiwan-cell-towers',
+    html:
+      'Taiwan cell towers: positions from ' +
+      '<a href="https://github.com/loxyz-tw/cell_tower_tw" target="_blank" rel="noopener">loxyz-tw/cell_tower_tw</a> (2016 snapshot); ' +
+      '4G/5G licence counts: <a href="https://data.gov.tw/dataset/22592" target="_blank" rel="noopener">國家通訊傳播委員會 NCC</a> ' +
+      '(Open Government Data License v1.0)',
+  },
+  {
     key: 'nlsc-3d-buildings',
     html:
       '3D buildings (Taiwan): ' +

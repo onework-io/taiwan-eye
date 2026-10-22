@@ -114,6 +114,10 @@
   mask-image: url('/ui-icons/cctv.svg');
   -webkit-mask-image: url('/ui-icons/cctv.svg');
 }
+.tw-icon-tower {
+  mask-image: url('/ui-icons/tower.svg');
+  -webkit-mask-image: url('/ui-icons/tower.svg');
+}
 .tw-icon-city3d {
   mask-image: url('/ui-icons/city3d.svg');
   -webkit-mask-image: url('/ui-icons/city3d.svg');

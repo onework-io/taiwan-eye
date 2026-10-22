@@ -28,6 +28,7 @@ import { createApplicationAirQuality } from './layers/airQuality.js';
 import { createApplicationFirePerimeters } from './layers/perimeters.js';
 import { createApplicationGnssIntegrity } from './layers/gnss.js';
 import { createApplicationTaiwanWater } from './layers/taiwanWater.js';
+import { createApplicationTaiwanCellTowers } from './layers/taiwanCellTowers.js';
 import { createApplicationCables } from './layers/submarineCables.js';
 import { createApplicationStreetLevel } from './layers/streetLevel.js';
 import { createInfrastructureLayers } from '../data/infrastructure.js';
@@ -128,6 +129,9 @@ export function createApplicationCatalog({
           source: sources['gnss-integrity'],
         }),
         createApplicationTaiwanWater({ source: sources['taiwan-water'] }),
+        createApplicationTaiwanCellTowers({
+          source: sources['taiwan-cell-towers'],
+        }),
         createApplicationAlpr({ surface, source: sources.alpr }),
         createApplicationStreetLevel({
           surface,

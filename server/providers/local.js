@@ -27,6 +27,7 @@ import { weatherProxy } from './weather.js';
 import { firePerimetersProxy } from './firePerimeters.js';
 import { gnssIntegrityProxy } from './gnssIntegrity.js';
 import { taiwanWaterProxy } from './taiwanWater.js';
+import { taiwanCellTowersProxy } from './taiwanCellTowers.js';
 import { cycloneProxy } from './cyclones.js';
 import { windProxy } from './wind.js';
 
@@ -66,6 +67,7 @@ function localProviderPlugins({ realtime, gemini } = {}) {
     firePerimetersProxy(),
     gnssIntegrityProxy(),
     taiwanWaterProxy(),
+    taiwanCellTowersProxy(),
     keySetupEndpoint(),
   ];
 }

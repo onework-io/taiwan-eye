@@ -94,6 +94,13 @@ export const FIRST_RUN_MISSIONS = Object.freeze({
     camera: 'taipei',
     busyKey: msg('Loading traffic cameras and YouBike…'),
   }),
+  'taiwan-cell': Object.freeze({
+    kind: 'globe',
+    // ~84k site positions (community 2016 snapshot) + NCC 4G/5G counts.
+    layerIds: Object.freeze(['taiwan-cell-towers']),
+    camera: 'taiwan',
+    busyKey: msg('Loading cell towers…'),
+  }),
   'taiwan-3d': Object.freeze({
     kind: 'globe',
     // NLSC 3D Tiles are a map overlay, not a data layer.

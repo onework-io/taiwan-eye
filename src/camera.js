@@ -88,7 +88,7 @@ export function flyToTaiwan(viewer) {
 export function flyToTaiwanOverview(viewer) {
   if (!viewer || viewer.isDestroyed?.()) return;
   viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(120.9, 21.75, 330000),
+    destination: Cesium.Cartesian3.fromDegrees(120.95, 21.2, 430000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-58),

@@ -3030,5 +3030,13 @@
   "NLSC 3D buildings, starting at Taipei 101": "3D-здания NLSC, начиная с Taipei 101",
   "Loading Taiwan water…": "Загрузка данных о воде Тайваня…",
   "Loading traffic cameras and YouBike…": "Загрузка дорожных камер и YouBike…",
-  "Loading Taipei 3D buildings…": "Загрузка 3D-зданий Тайбэя…"
+  "Loading Taipei 3D buildings…": "Загрузка 3D-зданий Тайбэя…",
+  "CELL TOWERS": "БАЗОВЫЕ СТАНЦИИ",
+  "Mobile base-station sites, with NCC 4G/5G licence counts": "Площадки базовых станций и число лицензий 4G/5G по данным NCC",
+  "Loading cell towers…": "Загрузка базовых станций…",
+  "Taiwan cell towers": "Базовые станции Тайваня",
+  "Taiwan cell tower request failed": "Ошибка запроса базовых станций Тайваня",
+  "{count} tower sites (positions as of {asOf})": "{count} площадок (координаты на {asOf})",
+  "NCC {period}: 4G {g4} · 5G {g5}": "NCC {period}: 4G {g4} · 5G {g5}",
+  "Malformed Taiwan cell tower snapshot": "Некорректные данные базовых станций Тайваня"
 }
