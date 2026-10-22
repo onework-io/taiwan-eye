@@ -382,6 +382,12 @@ export function initFirstRunExperience({
   const status = root.querySelector('[data-first-run-status]');
   const suppressBox = root.querySelector('[data-first-run-suppress]');
   const buttons = [...root.querySelectorAll('[data-first-run-choice]')];
+  // Taiwan edition: voice is off unless VITE_ENABLE_VOICE=1, so drop the
+  // "talk to the map" tip with it.
+  const voiceOn = import.meta.env
+    ? import.meta.env.VITE_ENABLE_VOICE === '1'
+    : true;
+  if (status && !voiceOn) status.textContent = '';
   const defaultStatus = status?.textContent || '';
   let busy = false;
   let closing = false;
