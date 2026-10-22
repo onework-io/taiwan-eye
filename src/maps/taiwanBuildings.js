@@ -205,10 +205,10 @@ export const TAIWAN_BUILDINGS_BASE_URL =
   'https://3dtiles.nlsc.gov.tw/building/tiles3d';
 export const TAIWAN_BUILDINGS_STORAGE_KEY = 'gev:taiwan-3d-buildings:v1';
 /** Above this camera height the overlay is hidden (buildings are invisible). */
-export const MAX_VIEW_HEIGHT_M = 20000;
+export const MAX_VIEW_HEIGHT_M = 60000;
 /** Load a county when the camera's ground point is this close to its edge. */
 export const LOAD_MARGIN_KM = 8;
-export const MAX_LOADED = 1;
+export const MAX_LOADED = 3;
 
 export function tilesetUrl(entry) {
   return `${TAIWAN_BUILDINGS_BASE_URL}/${entry.id}/tileset.json`;
@@ -270,26 +270,97 @@ function writeStoredEnabled(enabled, storage = globalThis.localStorage) {
 
 /** Window events: the UI asks with TOGGLE_EVENT, the overlay answers with STATE_EVENT. */
 /**
- * The NLSC tile server answers roughly one request in three with a spurious
- * HTTP 406 (or a 5xx), at random and independent of headers or concurrency;
- * the same file succeeds a moment later. Without a retry Cesium keeps only the
- * coarse parent tiles, which show as grey shards. Retry those, with jitter.
+ * One of the four backends behind 3dtiles.nlsc.gov.tw is broken: every fourth
+ * request, round-robin, gets HTTP 406 with a "missing index" page; the same
+ * file succeeds on the next request. Cesium's own Resource retry cannot cover
+ * it: a retried request re-enters the throttled request scheduler and is
+ * silently dropped when no slot is free, the tile is marked failed for good,
+ * and with REPLACE refinement one failed child pins its whole branch at the
+ * coarse parent (the grey shards). So the retry happens one level down,
+ * inside the single XHR the scheduler already granted, for NLSC URLs only.
  */
-export const NLSC_RETRY_ATTEMPTS = 5;
+export const NLSC_HOST = '3dtiles.nlsc.gov.tw';
+export const NLSC_RETRY_ATTEMPTS = 8;
 
-/** Whether a failed tile request is worth another try. */
+/** Whether a failed NLSC request is worth another try. */
 export function isRetryableTileError(error) {
   const status = Number(error?.statusCode);
   if (!Number.isFinite(status) || status === 0) return true; // network blip
   return status === 406 || status === 408 || status === 429 || status >= 500;
 }
 
-/** Resolve after a jittered back-off, then say whether to retry. */
-export function nlscRetryCallback(_resource, error) {
-  const delay = 200 + Math.random() * 600;
-  return new Promise((resolve) =>
-    setTimeout(() => resolve(isRetryableTileError(error)), delay),
-  );
+const isNlscUrl = (url) => {
+  try {
+    return new URL(String(url), 'http://localhost').host === NLSC_HOST;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Wrap Cesium's XHR transport so NLSC requests retry in place. Idempotent.
+ * @param {{_Implementations: {loadWithXhr: Function}}} Resource Cesium.Resource
+ */
+export function installNlscRetry(
+  Resource,
+  { attempts = NLSC_RETRY_ATTEMPTS, delay = (n) => 40 * n } = {},
+) {
+  const impl = Resource?._Implementations;
+  if (!impl || impl.loadWithXhr?.__nlscRetry) return;
+  const original = impl.loadWithXhr;
+  const wrapped = function (
+    url,
+    responseType,
+    method,
+    data,
+    headers,
+    deferred,
+    overrideMimeType,
+  ) {
+    if (!isNlscUrl(url))
+      return original.call(
+        impl,
+        url,
+        responseType,
+        method,
+        data,
+        headers,
+        deferred,
+        overrideMimeType,
+      );
+    let current = null;
+    let aborted = false;
+    const attempt = (n) => {
+      const inner = {
+        resolve: (value) => deferred.resolve(value),
+        reject: (error) => {
+          if (!aborted && n < attempts && isRetryableTileError(error))
+            setTimeout(() => !aborted && attempt(n + 1), delay(n));
+          else deferred.reject(error);
+        },
+      };
+      current = original.call(
+        impl,
+        url,
+        responseType,
+        method,
+        data,
+        headers,
+        inner,
+        overrideMimeType,
+      );
+    };
+    attempt(1);
+    // The scheduler cancels through xhr.abort(); stop retrying too.
+    return {
+      abort() {
+        aborted = true;
+        current?.abort?.();
+      },
+    };
+  };
+  wrapped.__nlscRetry = true;
+  impl.loadWithXhr = wrapped;
 }
 
 export const TOGGLE_EVENT = 'gev:taiwan-3d-toggle';
@@ -307,6 +378,7 @@ export function createTaiwanBuildingsOverlay(
   viewer,
   { Cesium, requestRender = () => {}, storage = globalThis.localStorage } = {},
 ) {
+  installNlscRetry(Cesium.Resource);
   const scene = viewer.scene;
   const collection = scene.primitives.add(
     new Cesium.PrimitiveCollection({ destroyPrimitives: true }),
@@ -362,16 +434,10 @@ export function createTaiwanBuildingsOverlay(
     loaded.set(entry.key, record);
     record.lastUsed = Date.now();
     if (record.tileset || record.loading) return record.loading;
-    // Derived tile requests inherit the retry policy from this resource.
-    const resource = new Cesium.Resource({
-      url: tilesetUrl(entry),
-      retryAttempts: NLSC_RETRY_ATTEMPTS,
-      retryCallback: nlscRetryCallback,
-    });
-    record.loading = Cesium.Cesium3DTileset.fromUrl(resource, {
-      maximumScreenSpaceError: 24,
-      cacheBytes: 160 * 1024 * 1024,
-      maximumCacheOverflowBytes: 64 * 1024 * 1024,
+    record.loading = Cesium.Cesium3DTileset.fromUrl(tilesetUrl(entry), {
+      maximumScreenSpaceError: 16,
+      cacheBytes: 384 * 1024 * 1024,
+      maximumCacheOverflowBytes: 256 * 1024 * 1024,
       // Rooftops stop the camera like the photoreal mesh does.
       enableCollision: true,
     })
@@ -457,6 +523,8 @@ export function createTaiwanBuildingsOverlay(
     },
     isEnabled: () => enabled,
     activeCounties: () => lastActive.map((e) => e.name),
+    /** The live tileset for one county key (dev console only). */
+    tileset: (key) => loaded.get(key)?.tileset || null,
     update,
     destroy() {
       if (destroyed) return;
