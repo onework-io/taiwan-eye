@@ -6,6 +6,9 @@ import {
   tilesetUrl,
   readStoredEnabled,
   TAIWAN_BUILDINGS_STORAGE_KEY,
+  isRetryableTileError,
+  nlscRetryCallback,
+  NLSC_RETRY_ATTEMPTS,
 } from './taiwanBuildings.js';
 
 test('Taipei 101 loads the Taipei per-building model first', () => {
@@ -47,4 +50,22 @@ test('the overlay defaults on and remembers being turned off', () => {
     }),
     true,
   );
+});
+
+test('spurious NLSC 406s and server errors are retried, real misses are not', async () => {
+  assert.ok(NLSC_RETRY_ATTEMPTS >= 3);
+  for (const statusCode of [406, 429, 500, 503, undefined, 0])
+    assert.equal(
+      isRetryableTileError({ statusCode }),
+      true,
+      String(statusCode),
+    );
+  for (const statusCode of [400, 403, 404])
+    assert.equal(
+      isRetryableTileError({ statusCode }),
+      false,
+      String(statusCode),
+    );
+  assert.equal(await nlscRetryCallback(null, { statusCode: 406 }), true);
+  assert.equal(await nlscRetryCallback(null, { statusCode: 404 }), false);
 });

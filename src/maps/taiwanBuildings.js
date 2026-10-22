@@ -269,6 +269,29 @@ function writeStoredEnabled(enabled, storage = globalThis.localStorage) {
 }
 
 /** Window events: the UI asks with TOGGLE_EVENT, the overlay answers with STATE_EVENT. */
+/**
+ * The NLSC tile server answers roughly one request in three with a spurious
+ * HTTP 406 (or a 5xx), at random and independent of headers or concurrency;
+ * the same file succeeds a moment later. Without a retry Cesium keeps only the
+ * coarse parent tiles, which show as grey shards. Retry those, with jitter.
+ */
+export const NLSC_RETRY_ATTEMPTS = 5;
+
+/** Whether a failed tile request is worth another try. */
+export function isRetryableTileError(error) {
+  const status = Number(error?.statusCode);
+  if (!Number.isFinite(status) || status === 0) return true; // network blip
+  return status === 406 || status === 408 || status === 429 || status >= 500;
+}
+
+/** Resolve after a jittered back-off, then say whether to retry. */
+export function nlscRetryCallback(_resource, error) {
+  const delay = 200 + Math.random() * 600;
+  return new Promise((resolve) =>
+    setTimeout(() => resolve(isRetryableTileError(error)), delay),
+  );
+}
+
 export const TOGGLE_EVENT = 'gev:taiwan-3d-toggle';
 export const STATE_EVENT = 'gev:taiwan-3d-state';
 
@@ -339,7 +362,13 @@ export function createTaiwanBuildingsOverlay(
     loaded.set(entry.key, record);
     record.lastUsed = Date.now();
     if (record.tileset || record.loading) return record.loading;
-    record.loading = Cesium.Cesium3DTileset.fromUrl(tilesetUrl(entry), {
+    // Derived tile requests inherit the retry policy from this resource.
+    const resource = new Cesium.Resource({
+      url: tilesetUrl(entry),
+      retryAttempts: NLSC_RETRY_ATTEMPTS,
+      retryCallback: nlscRetryCallback,
+    });
+    record.loading = Cesium.Cesium3DTileset.fromUrl(resource, {
       maximumScreenSpaceError: 24,
       cacheBytes: 160 * 1024 * 1024,
       maximumCacheOverflowBytes: 64 * 1024 * 1024,
