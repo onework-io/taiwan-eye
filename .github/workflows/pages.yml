@@ -1,0 +1,58 @@
+# Publish the static demo of 台灣天眼 to GitHub Pages:
+#   https://onework-io.github.io/taiwan-eye/
+# GitHub Pages serves files only, so the /api/* layers that need the Node
+# server (water, CCTV, YouBike, cell towers, flights, ships…) do not work
+# there; the globe, imagery, NLSC 3D buildings, city presets and visual
+# styles do. Run the full app locally with `npm run dev`.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24.14.0
+          cache: npm
+      - run: npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: '1'
+      - name: Build for the /taiwan-eye/ subpath
+        run: npx vite build --base=/taiwan-eye/
+      - name: Put Cesium where the subpath expects it
+        run: |
+          if [ -d dist/taiwan-eye/cesium ]; then
+            rm -rf dist/cesium
+            mv dist/taiwan-eye/cesium dist/cesium
+            rmdir dist/taiwan-eye 2>/dev/null || true
+          fi
+          test -f dist/cesium/Cesium.js
+          touch dist/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
