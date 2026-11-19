@@ -134,3 +134,10 @@
 #global-context-missions-btn {
   display: none !important;
 }
+
+/* Taiwan edition: the top-left 台灣天眼 title block is hidden for now.
+ * The element stays in the DOM (frame-rate readout, radio indicator and the
+ * layout/occluder code look it up); remove this rule to bring it back. */
+#title-bar {
+  display: none !important;
+}

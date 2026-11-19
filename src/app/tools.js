@@ -6,7 +6,11 @@ import { initImageryBoxTool } from '../ui/imageryBoxTool.js';
 import { createRecentImageryPanel } from '../ui/recentImagery.js';
 import { initGevVoiceCommands } from '../voice/gevRealtime.js';
 import { installViews, isEmbeddedInline } from './embed.js';
-import { installScopeMask, destroyScopeMask } from '../scopeMask.js';
+import {
+  installScopeMask,
+  destroyScopeMask,
+  setScopeMaskEnabled,
+} from '../scopeMask.js';
 import {
   installRenderGovernor,
   getRenderGovernorDiagnostics,
@@ -113,6 +117,11 @@ export function createApplicationTools({
 
   // Install the explicit scope mask used by the DISPLAY controls.
   installScopeMask(viewer);
+  // Taiwan edition: the scope (瞄準鏡) starts off; its toggle or a shared
+  // link's sc=1 turns it back on.
+  setScopeMaskEnabled(false);
+  // Re-publish so the URL hash (sc=…) and share links match the new default.
+  styleManager?._syncShareState?.();
   defer(() => destroyScopeMask());
 
   // The follow camera recomputes the tracked target's dead-reckon position
